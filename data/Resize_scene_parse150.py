@@ -19,8 +19,6 @@ try:
     tf_dataset = tfds.load(name="scene_parse150")
 
     dataset = tfds.as_numpy(tf_dataset)
-    # dataset_train, dataset_test = dataset["train"], dataset["test"]
-    # dataset_image_list, dataset_annotation_list = [], []
     dataset_lists = {"train_image": [], "train_annotation": [], "test_image": [], "test_annotation": []}
 
     # Build your input pipeline
@@ -31,10 +29,7 @@ try:
         for features in dataset[Mode]:
             image, annotation = features["image"], features["annotation"]
             height, width = image.shape[0], image.shape[1]
-            # print("image : ", image.shape, image.dtype)
-            # print("annotation : ", annotation.shape, annotation.dtype)
             if i == SAMPLE:
-                # print("================================")
                 save_img("image_raw.png", image)
                 save_img("annotation_raw.png", annotation)
 
@@ -50,22 +45,19 @@ try:
             annotation = tf.image.resize_with_pad(annotation, CROP_HEIGHT, CROP_WIDTH)
             annotation = tf.cast(annotation, tf.uint8)
 
-            # print("image : ", image.dtype, image.shape, image.dtype)
-            # print("annotation : ", annotation.dtype, annotation.shape, annotation.dtype)
-
             if i == SAMPLE:
                 save_img("image_resized.png", image)
                 save_img("annotation_resized.png", annotation)
 
-            dataset_lists[Mode + "_image"].append(image)
-            dataset_lists[Mode + "_annotation"].append(annotation)
+            dataset_lists[Mode + "_image"].append(image.numpy())
+            dataset_lists[Mode + "_annotation"].append(annotation.numpy())
             i += 1
 
     print("\n\n\n")
-    print("train_image :", len(dataset_lists["train_image"]), dataset_lists["train_image"][0].shape)
-    print("train_annotation :", len(dataset_lists["train_annotation"]), dataset_lists["train_annotation"][0].shape)
-    print("test_image :", len(dataset_lists["test_image"]), dataset_lists["test_image"][0].shape)
-    print("test_annotation :", len(dataset_lists["test_annotation"]), dataset_lists["test_annotation"][0].shape)
+    print("train_image :", len(dataset_lists["train_image"]), dataset_lists["train_image"][0].shape, type(dataset_lists["train_image"][0]))
+    print("train_annotation :", len(dataset_lists["train_annotation"]), dataset_lists["train_annotation"][0].shape, type(dataset_lists["train_annotation"][0]))
+    print("test_image :", len(dataset_lists["test_image"]), dataset_lists["test_image"][0].shape, type(dataset_lists["test_image"][0]))
+    print("test_annotation :", len(dataset_lists["test_annotation"]), dataset_lists["test_annotation"][0].shape, type(dataset_lists["test_annotation"][0]))
 
     print("\n\n\nConvert to ndarray...   ", end="")
 
@@ -76,7 +68,7 @@ try:
 
     print("Done")
 
-    np.savez("data/scene_parse150_resize", 
+    np.savez("scene_parse150_resize", 
             train_image=train_image_array, 
             train_annotation=train_annotation_array, 
             test_image=test_image_array, 
