@@ -2,6 +2,7 @@ import numpy as np
 import tensorflow as tf
 import tensorflow_datasets as tfds
 from tensorflow.keras.preprocessing.image import save_img
+from Convert_one_hot_vector import Convert_img2onehotvector
 
 try:
     print(tf.version.VERSION)
@@ -30,6 +31,7 @@ try:
             image, annotation = features["image"], features["annotation"]
             height, width = image.shape[0], image.shape[1]
             if i == SAMPLE:
+                print(image.shape, annotation.shape)
                 save_img("image_raw.png", image)
                 save_img("annotation_raw.png", annotation)
 
@@ -49,8 +51,9 @@ try:
                 save_img("image_resized.png", image)
                 save_img("annotation_resized.png", annotation)
 
+            annotation = Convert_img2onehotvector(annotation.numpy())
             dataset_lists[Mode + "_image"].append(image.numpy())
-            dataset_lists[Mode + "_annotation"].append(annotation.numpy())
+            dataset_lists[Mode + "_annotation"].append(annotation)
             i += 1
 
     print("\n\n\n")
