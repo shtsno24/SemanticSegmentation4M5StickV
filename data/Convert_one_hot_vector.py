@@ -1,4 +1,5 @@
 import numpy as np
+import time
 
 
 def create_scene_parse150_label_colormap():
@@ -20,7 +21,7 @@ def create_scene_parse150_label_colormap():
         [120, 120, 80],
         [140, 140, 140],
         [204, 5, 255],
-        [230, 230, 230], #
+        [230, 230, 230],
         [4, 250, 7],
         [224, 5, 255],
         [235, 255, 7],
@@ -30,7 +31,7 @@ def create_scene_parse150_label_colormap():
         [255, 6, 82],
         [143, 255, 140],
         [204, 255, 4],
-        [255, 51, 7], #
+        [255, 51, 7],
         [204, 70, 3],
         [0, 102, 200],
         [61, 230, 250],
@@ -40,7 +41,7 @@ def create_scene_parse150_label_colormap():
         [255, 9, 224],
         [9, 7, 230],
         [220, 220, 220],
-        [255, 9, 92], # 
+        [255, 9, 92],
         [112, 9, 255],
         [8, 255, 214],
         [7, 255, 224],
@@ -49,7 +50,7 @@ def create_scene_parse150_label_colormap():
         [255, 41, 10],
         [7, 255, 255],
         [224, 255, 8],
-        [102, 8, 255], #
+        [102, 8, 255],
         [255, 61, 6],
         [255, 194, 7],
         [255, 122, 8],
@@ -59,7 +60,7 @@ def create_scene_parse150_label_colormap():
         [6, 51, 255],
         [235, 12, 255],
         [160, 150, 20],
-        [0, 163, 255], #
+        [0, 163, 255],
         [140, 140, 140],
         [250, 10, 15],
         [20, 255, 0],
@@ -164,50 +165,74 @@ def create_scene_parse150_label_colormap():
         [92, 0, 255],
     ], dtype=np.uint8)
 
-    colormap_dict = {0 : (colormap_array[0][0], colormap_array[0][1], colormap_array[0][2])}
+    # colormap_dict = {0: (colormap_array[0][0], colormap_array[0][1], colormap_array[0][2])}
+    # for i in range(colormap_array.shape[0]):
+    #     colormap_dict.update({i: (colormap_array[i][0], colormap_array[i][1], colormap_array[i][2])})
+    colormap_dict = {(colormap_array[0][0], colormap_array[0][1], colormap_array[0][2]): 0}
     for i in range(colormap_array.shape[0]):
-        colormap_dict.update({i : (colormap_array[i][0], colormap_array[i][1], colormap_array[i][2])})
-
+        print(i)
+        colormap_dict.update({(colormap_array[i][0], colormap_array[i][1], colormap_array[i][2]): i})
+    print("\n\n")
     return colormap_dict
 
-def rgb2onehot(x, DTYPE=np.uint8):
-    color_map = create_scene_parse150_label_colormap()
+
+def rgb2onehot(x, Color_map, DTYPE=np.uint8):
+    color_map = Color_map
     classes = len(color_map)
     shapes = x.shape[:2] + (classes,)
 
     output_array = np.zeros((shapes), dtype=np.uint8)
     for i, buff in enumerate(color_map):
-        output_array[:,:,i] = np.all(x.reshape((-1,3)) == color_map[i], axis=1).reshape(shapes[:2])
+        output_array[:, :, i] = np.all(x.reshape((-1, 3)) == color_map[i], axis=1).reshape(shapes[:2])
 
     return output_array.astype(DTYPE)
 
 
-def test():
-    array_size = 5
+def test(Color_map):
+    array_size = 128
     array_depth = 3
     x = np.zeros((array_size, array_size, array_depth), dtype=np.uint8)
     index_map = np.zeros((array_size, array_size), dtype=np.uint8)
-    color_map = create_scene_parse150_label_colormap()
+    color_map = Color_map
     classes = len(color_map)
-
+    print(classes)
+    print("\n\n")
+    i = 0
     for X in range(array_size):
         for Y in range(array_size):
             rand_index = np.random.randint(0, classes)
             index_map[X][Y] = rand_index
+            if i == 0:
+                rand_index = 7
+                i = 1
+            print(rand_index)
+            buff_color_list = [k for k, v in color_map.items() if v == rand_index][0]
             for i in range(array_depth):
-                x[X][Y][i] = color_map[rand_index][i]
+                x[X][Y][i] = buff_color_list[i]
 
-    shapes = x.shape[:2] + (classes,)
-    output_array = np.zeros((shapes), dtype=np.uint8)
-    for i, buff in enumerate(color_map):
-        output_array[:,:,i] = np.all(x.reshape((-1,3)) == color_map[i], axis=1).reshape(shapes[:2])
+    # shapes = x.shape[:2] + (classes,)
+    # output_array = np.zeros((shapes), dtype=np.uint8)
+    # for i, buff in enumerate(color_map):
+    #     output_array[:, :, i] = np.all(x.reshape((-1, 3)) == color_map[i], axis=1).reshape(shapes[:2])
 
-    print(np.array_equal(output_array.argmax(axis=2).astype(np.uint8), index_map))
+    output_array = np.zeros((x.shape[:2]), dtype=np.uint8)
+    for X in range(array_size):
+        for Y in range(array_size):
+            color_tuple = (x[X][Y][0], x[X][Y][1], x[X][Y][2])
+            output_array[X][Y] = color_map[color_tuple]
+
+    print(np.array_equal(output_array, index_map))
     print("\n\n")
-    print(output_array.argmax(axis=2).astype(np.uint8))
+    print(output_array)
     print("\n\n")
     print(index_map)
     return output_array
 
+
 if __name__ == "__main__":
-    test()
+    start = time.time()
+    color_map = create_scene_parse150_label_colormap()
+    for i in range(1):
+        test(color_map)
+    end = time.time()
+    print(str(end - start) + "[s]")

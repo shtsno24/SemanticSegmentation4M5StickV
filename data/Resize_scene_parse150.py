@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 import tensorflow_datasets as tfds
 from tensorflow.keras.preprocessing.image import save_img, array_to_img
-from Convert_one_hot_vector import rgb2onehot
+from Convert_one_hot_vector import rgb2onehot, create_scene_parse150_label_colormap
 
 try:
     print(tf.version.VERSION)
@@ -12,6 +12,7 @@ try:
     CROP_HEIGHT = 112
     CROP_WIDTH = 112
     SAMPLE = np.random.randint(30)
+    COLOR_MAP = create_scene_parse150_label_colormap()
 
     # See available datasets
     print(tfds.list_builders())
@@ -53,12 +54,12 @@ try:
                 save_img("annotation_resized.png", annotation)
                 Shape = annotation.shape[:2] + (1,)
                 print(Shape)
-                print(np.argmax(rgb2onehot(annotation.numpy()), axis=2))
-                one_hot_img_R = np.argmax(rgb2onehot(annotation.numpy()), axis=2).reshape(Shape)
+                print(np.argmax(rgb2onehot(annotation.numpy(), COLOR_MAP), axis=2))
+                one_hot_img_R = np.argmax(rgb2onehot(annotation.numpy(), COLOR_MAP), axis=2).reshape(Shape)
                 one_hot_img = np.concatenate((one_hot_img_R, one_hot_img_R, one_hot_img_R), axis=2)
                 save_img("annotation_resized_one_hot.png", one_hot_img)
 
-            annotation = rgb2onehot(annotation.numpy())
+            annotation = rgb2onehot(annotation.numpy(), COLOR_MAP)
             dataset_lists[Mode + "_image"].append(image.numpy())
             dataset_lists[Mode + "_annotation"].append(annotation)
             i += 1
