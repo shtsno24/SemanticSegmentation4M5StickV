@@ -20,7 +20,7 @@ def create_scene_parse150_label_colormap():
         [120, 120, 80],
         [140, 140, 140],
         [204, 5, 255],
-        [230, 230, 230],
+        [230, 230, 230], #
         [4, 250, 7],
         [224, 5, 255],
         [235, 255, 7],
@@ -30,7 +30,7 @@ def create_scene_parse150_label_colormap():
         [255, 6, 82],
         [143, 255, 140],
         [204, 255, 4],
-        [255, 51, 7],
+        [255, 51, 7], #
         [204, 70, 3],
         [0, 102, 200],
         [61, 230, 250],
@@ -40,7 +40,7 @@ def create_scene_parse150_label_colormap():
         [255, 9, 224],
         [9, 7, 230],
         [220, 220, 220],
-        [255, 9, 92],
+        [255, 9, 92], # 
         [112, 9, 255],
         [8, 255, 214],
         [7, 255, 224],
@@ -49,7 +49,7 @@ def create_scene_parse150_label_colormap():
         [255, 41, 10],
         [7, 255, 255],
         [224, 255, 8],
-        [102, 8, 255],
+        [102, 8, 255], #
         [255, 61, 6],
         [255, 194, 7],
         [255, 122, 8],
@@ -59,7 +59,7 @@ def create_scene_parse150_label_colormap():
         [6, 51, 255],
         [235, 12, 255],
         [160, 150, 20],
-        [0, 163, 255],
+        [0, 163, 255], #
         [140, 140, 140],
         [250, 10, 15],
         [20, 255, 0],
@@ -164,41 +164,50 @@ def create_scene_parse150_label_colormap():
         [92, 0, 255],
     ], dtype=np.uint8)
 
-    colormap_dict = {(colormap_array[0][0], colormap_array[0][1], colormap_array[0][2]) : 0}
+    colormap_dict = {0 : (colormap_array[0][0], colormap_array[0][1], colormap_array[0][2])}
     for i in range(colormap_array.shape[0]):
-        colormap_dict.update({(colormap_array[i][0], colormap_array[i][1], colormap_array[i][2]) : i})
+        colormap_dict.update({i : (colormap_array[i][0], colormap_array[i][1], colormap_array[i][2])})
 
     return colormap_dict
 
-def Convert_img2onehotvector(x, DTYPE=np.uint8):
-    y = create_scene_parse150_label_colormap()
-    output_array = np.zeros((x.shape[0], x.shape[1], len(y)+1), dtype=np.uint8)
+def rgb2onehot(x, DTYPE=np.uint8):
+    color_map = create_scene_parse150_label_colormap()
+    classes = len(color_map)
+    shapes = x.shape[:2] + (classes,)
 
-    for X in range(x.shape[0]):
-        for Y in range(x.shape[1]):
-            try:
-                key_value = (x[X][Y][0], x[X][Y][1], x[X][Y][2])
-                output_array[X][Y][y[key_value]] = 1
-            except KeyError:
-                output_array[X][Y][0] = 1
+    output_array = np.zeros((shapes), dtype=np.uint8)
+    for i, buff in enumerate(color_map):
+        output_array[:,:,i] = np.all(x.reshape((-1,3)) == color_map[i], axis=1).reshape(shapes[:2])
 
-    return output_array
+    return output_array.astype(DTYPE)
 
 
 def test():
-    x = np.random.randint(0, 255, size=(112, 112, 3), dtype=np.uint8)
-    y = create_scene_parse150_label_colormap()
-    output_array = np.zeros((x.shape[0], x.shape[1], len(y)+1), dtype=np.uint8)
+    array_size = 5
+    array_depth = 3
+    x = np.zeros((array_size, array_size, array_depth), dtype=np.uint8)
+    index_map = np.zeros((array_size, array_size), dtype=np.uint8)
+    color_map = create_scene_parse150_label_colormap()
+    classes = len(color_map)
 
+    for X in range(array_size):
+        for Y in range(array_size):
+            rand_index = np.random.randint(0, classes)
+            index_map[X][Y] = rand_index
+            for i in range(array_depth):
+                x[X][Y][i] = color_map[rand_index][i]
 
-    for X in range(x.shape[0]):
-        for Y in range(x.shape[1]):
-            try:
-                key_value = (x[X][Y][0], x[X][Y][1], x[X][Y][2])
-                output_array[X][Y][y[key_value]] = 1
-            except KeyError:
-                output_array[X][Y][0] = 1
-    print(output_array)
+    shapes = x.shape[:2] + (classes,)
+    output_array = np.zeros((shapes), dtype=np.uint8)
+    for i, buff in enumerate(color_map):
+        output_array[:,:,i] = np.all(x.reshape((-1,3)) == color_map[i], axis=1).reshape(shapes[:2])
+
+    print(np.array_equal(output_array.argmax(axis=2).astype(np.uint8), index_map))
+    print("\n\n")
+    print(output_array.argmax(axis=2).astype(np.uint8))
+    print("\n\n")
+    print(index_map)
+    return output_array
 
 if __name__ == "__main__":
     test()
