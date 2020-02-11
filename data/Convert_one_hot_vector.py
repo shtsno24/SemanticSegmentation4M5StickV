@@ -5,27 +5,7 @@ from get_color_label import get_file_name, generate_color_index
 FILE_PATH = "./color150/"
 
 
-def create_scene_parse150_label_colormap(path_to_file, file_format="jpg"):
-    """
-    Creates a label colormap and label names used in Scene Parse150 segmentation benchmark.
-    https://github.com/CSAILVision/sceneparsing/tree/master/visualizationCode/color150
-    """
-    file_list = get_file_name(path_to_file)
-    color_dict, index_dict = generate_color_index(path_to_file, file_list, file_format=file_format)
-
-    return color_dict, index_dict
-
-
-def test_create_label():
-    color_dict, index_dict = create_scene_parse150_label_colormap()
-    print(len(color_dict), len(index_dict))
-    print("\n\n")
-    print(color_dict)
-    print("\n\n")
-    print(index_dict)
-
-
-def rgb2onehot(x, Color_map, DTYPE=np.uint8):
+def label2onehot(x, Color_map, DTYPE=np.uint8):
     color_map = Color_map
     classes = len(color_map)
     shapes = x.shape[:2] + (classes,)
@@ -34,14 +14,12 @@ def rgb2onehot(x, Color_map, DTYPE=np.uint8):
     # for i, buff in enumerate(color_map):
     #     output_array[:, :, i] = np.all(x.reshape((-1, 3)) == color_map[i], axis=1).reshape(shapes[:2])
     output_array = np.zeros(shapes, dtype=DTYPE)
-    i = 0
     for X in range(output_array.shape[0]):
         for Y in range(output_array.shape[1]):
             try:
                 color_tuple = (x[X][Y][0], x[X][Y][1], x[X][Y][2])
                 output_array[X][Y][color_map[color_tuple][0]] = 1
             except KeyError:
-                i += 1
                 print(i, "KeyError :", color_tuple)
                 output_array[X][Y][0] = 1
 

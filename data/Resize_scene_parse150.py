@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 import tensorflow_datasets as tfds
 from tensorflow.keras.preprocessing.image import save_img, array_to_img
-from Convert_one_hot_vector import rgb2onehot, create_scene_parse150_label_colormap
+from Util import label2onehot, create_scene_parse150_label_dict
 
 try:
     print(tf.version.VERSION)
@@ -11,10 +11,11 @@ try:
     CHANNELS = 3
     CROP_HEIGHT = 112
     CROP_WIDTH = 112
-    SAMPLE = np.random.randint(30)
+    # SAMPLE = np.random.randint(30)
+    SAMPLE = 0
     FILE_PATH = "./color150/"
-    COLOR_MAP, INDEX_MAP = create_scene_parse150_label_colormap(FILE_PATH)
-
+    OBJECT_FILE = "objectinfo150.csv"
+    INDEX_PALETTE = create_scene_parse150_label_dict(FILE_PATH, OBJECT_FILE)
 
     # See available datasets
     print(tfds.list_builders())
@@ -54,14 +55,21 @@ try:
             if i == SAMPLE:
                 save_img("image_resized.png", image)
                 save_img("annotation_resized.png", annotation)
-                Shape = annotation.shape[:2] + (1,)
-                print(Shape)
-                print(np.argmax(rgb2onehot(annotation.numpy(), COLOR_MAP), axis=2))
-                one_hot_img_R = np.argmax(rgb2onehot(annotation.numpy(), COLOR_MAP), axis=2).reshape(Shape)
-                one_hot_img = np.concatenate((one_hot_img_R, one_hot_img_R, one_hot_img_R), axis=2)
+                Shape = annotation.shape[:2] + (3,)
+
+                one_hot_img_R = label2onehot(annotation.numpy(), INDEX_PALETTE, print_log=True)
+                print(one_hot_img_R.shape)
+                one_hot_img = np.zeros(Shape, dtype=np.uint8)
+                one_hot_img_R = np.argmax(one_hot_img_R, axis=2)
+                for X in range(Shape[0]):
+                    for Y in range(Shape[1]):
+                        one_hot_img[X][Y][0] = INDEX_PALETTE[one_hot_img_R[X][Y]][0][0]
+                        one_hot_img[X][Y][1] = INDEX_PALETTE[one_hot_img_R[X][Y]][0][1]
+                        one_hot_img[X][Y][2] = INDEX_PALETTE[one_hot_img_R[X][Y]][0][2]
+
                 save_img("annotation_resized_one_hot.png", one_hot_img)
 
-            annotation = rgb2onehot(annotation.numpy(), COLOR_MAP)
+            annotation = label2onehot(annotation.numpy(), INDEX_PALETTE)
             dataset_lists[Mode + "_image"].append(image.numpy())
             dataset_lists[Mode + "_annotation"].append(annotation)
             i += 1
