@@ -12,7 +12,9 @@ try:
     CROP_HEIGHT = 112
     CROP_WIDTH = 112
     SAMPLE = np.random.randint(30)
-    COLOR_MAP = create_scene_parse150_label_colormap()
+    FILE_PATH = "./color150/"
+    COLOR_MAP, INDEX_MAP = create_scene_parse150_label_colormap(FILE_PATH)
+
 
     # See available datasets
     print(tfds.list_builders())
@@ -21,10 +23,10 @@ try:
     tf_dataset = tfds.load(name="scene_parse150")
 
     dataset = tfds.as_numpy(tf_dataset)
+    print(tf_dataset)
     dataset_lists = {"train_image": [], "train_annotation": [], "test_image": [], "test_annotation": []}
 
-    # Build your input pipeline
-
+    # # Build your input pipeline
     print("\n\n\nResizing Images...")
     # for Mode in ("train", "test"):
     for Mode in ("test",):
@@ -79,11 +81,11 @@ try:
 
     print("Done")
 
-    np.savez("scene_parse150_resize", 
-            # train_image=train_image_array, 
-            # train_annotation=train_annotation_array, 
-            test_image=test_image_array, 
-            test_annotation=test_annotation_array)
+    np.savez("scene_parse150_resize",
+             # train_image=train_image_array,
+             # train_annotation=train_annotation_array,
+             test_image=test_image_array,
+             test_annotation=test_annotation_array)
 
     print("Saved")
 
