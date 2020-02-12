@@ -1,4 +1,6 @@
 get-pip.py
 data/scene_parse150_resize.npz
 *.npz
-*.jpg
+*.zip
+/data/color150
+/data/ADEChallengeData2016
