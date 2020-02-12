@@ -9,8 +9,8 @@ try:
     CROP_HEIGHT = 112
     CROP_WIDTH = 112
     LABELS = 151
-    # SAMPLE = np.random.randint(30)
-    SAMPLE = 0
+    SAMPLE = np.random.randint(30)
+    # SAMPLE = 0
     FILE_PATH = "./color150/"
     OBJECT_FILE = "objectinfo150.csv"
     INDEX_PALETTE = create_scene_parse150_label_dict(FILE_PATH, OBJECT_FILE)
@@ -29,9 +29,13 @@ try:
         file_list = [f for f in file_list_buffer if os.path.isfile(image_file_directories[Mode] + f)]
         Data_num = len(file_list)
         print(Mode, Data_num)
+        i = 0
         for f_name in file_list:
             raw_data = Image.open(image_file_directories[Mode] + f_name)
-            image_data = np.asarray(raw_data, dtype=np.uint8)
+            image_data = np.array(raw_data, dtype=np.uint8)
+            if i == SAMPLE:
+                pil_img = Image.fromarray(image_data)
+                pil_img.save(Mode + ".png")
             X, Y = image_data.shape[0], image_data.shape[1]
             if X < Y:
                 long_side = Y
@@ -51,6 +55,14 @@ try:
             else:
                 output_data = image_data
 
+            if i == SAMPLE:
+                if output_data.shape[2] > 3:
+                    output_data_argmax = output_data.argmax(axis=2).astype(np.uint8)
+                    pil_img = Image.fromarray(output_data_argmax)
+                else:
+                    pil_img = Image.fromarray(output_data)
+                pil_img.save(Mode + "_resized.png")
+            i += 1
             dataset_lists[Mode].append(output_data)
         print("Done")
 
@@ -68,7 +80,7 @@ try:
     test_annotation_array = np.asarray(dataset_lists["test_annotation"], dtype=np.uint8)
 
     print("Done")
-
+    print("\n\n\nConpressed data...   ", end="")
     np.savez_compressed("scene_parse150_resize",
                         # train_image=train_image_array,
                         # train_annotation=train_annotation_array,
