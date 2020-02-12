@@ -44,14 +44,19 @@ def create_scene_parse150_label_dict(path_to_file, object_file, file_format="jpg
 def label2onehot(x, index_palette, DTYPE=np.uint8, print_log=False):
     classes = len(index_palette)
     shapes = x.shape[:2] + (classes,)
+    x_r = x[:, :, 0]
+    x_g = x[:, :, 1]
 
-    output_array = np.zeros(shapes, dtype=DTYPE)
-    for X in range(output_array.shape[0]):
-        for Y in range(output_array.shape[1]):
-            output_array[X][Y][x[X][Y][0]] = 1
-            if print_log is True and x[X][Y][0] != 0:
-                print(x[X][Y], int(float(x[X][Y][0] / 10.0) * 256 + x[X][Y][1]), index_palette[x[X][Y][0]])
-    return output_array.astype(DTYPE)
+    output_array = np.zeros(shapes[:2], dtype=DTYPE)
+    output_array_buff = (x_r / 10).astype(np.uint16) * 256 + x_g.astype(np.uint16)
+
+    if print_log is True:
+        for X in range(output_array_buff.shape[0]):
+            for Y in range(output_array_buff.shape[1]):
+                print(X, Y)
+                if x[X][Y][0] != 0:
+                    print(x[X][Y], output_array_buff[X][Y], index_palette[output_array_buff[X][Y]])
+    return output_array_buff.astype(DTYPE)
 
 
 if __name__ == "__main__":
