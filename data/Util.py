@@ -48,14 +48,15 @@ def label2onehot(x, index_palette, DTYPE=np.uint8, print_log=False):
     x_g = x[:, :, 1]
 
     output_array = np.zeros(shapes[:2], dtype=DTYPE)
-    output_array_buff = (x_r / 10).astype(np.uint16) * 256 + x_g.astype(np.uint16)
+    output_array_buff = ((x_r).astype(np.uint16) / 10).astype(np.uint16) * 256 + x_g.astype(np.uint16)
 
     if print_log is True:
         for X in range(output_array_buff.shape[0]):
             for Y in range(output_array_buff.shape[1]):
-                print(X, Y)
-                if x[X][Y][0] != 0:
-                    print(x[X][Y], output_array_buff[X][Y], index_palette[output_array_buff[X][Y]])
+                # print(X, Y)
+                if x[X][Y][0] != 0 or x[X][Y][2] != 0 or x[X][Y][2] != 0 :
+                    print(x[X][Y], output_array_buff[X][Y])
+                    # print(index_palette[output_array_buff[X][Y]])
     return output_array_buff.astype(DTYPE)
 
 

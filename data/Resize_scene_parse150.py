@@ -60,7 +60,7 @@ try:
                 one_hot_img_R = label2onehot(annotation.numpy(), INDEX_PALETTE, print_log=True)
                 print(one_hot_img_R.shape)
                 one_hot_img = np.zeros(Shape, dtype=np.uint8)
-                one_hot_img_R = np.argmax(one_hot_img_R, axis=2)
+                # one_hot_img_R = np.argmax(one_hot_img_R, axis=2)
                 for X in range(Shape[0]):
                     for Y in range(Shape[1]):
                         one_hot_img[X][Y][0] = INDEX_PALETTE[one_hot_img_R[X][Y]][0][0]
