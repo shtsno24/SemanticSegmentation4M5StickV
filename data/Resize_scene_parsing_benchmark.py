@@ -16,15 +16,15 @@ try:
     INDEX_PALETTE = create_scene_parse150_label_dict(FILE_PATH, OBJECT_FILE)
 
     dataset_lists = {"train_image": [], "train_annotation": [], "test_image": [], "test_annotation": []}
-    image_file_directories = {"train_image": "./ADEChallengeData2016/images/training/", 
+    image_file_directories = {"train_image": "./ADEChallengeData2016/images/training/",
                               "train_annotation": "./ADEChallengeData2016/annotations/training/",
                               "test_image": "./ADEChallengeData2016/images/validation/",
                               "test_annotation": "./ADEChallengeData2016/annotations/validation/"}
 
     # Process image
     print("\n\n\nResizing Images...")
-    for Mode in ("train_image", "train_annotation", "test_image", "test_annotation"):
-    # for Mode in ("test_image","test_annotation"):
+    # for Mode in ("train_image", "train_annotation", "test_image", "test_annotation"):
+    for Mode in ("test_image", "test_annotation"):
         file_list_buffer = os.listdir(image_file_directories[Mode])
         file_list = [f for f in file_list_buffer if os.path.isfile(image_file_directories[Mode] + f)]
         Data_num = len(file_list)
@@ -47,7 +47,7 @@ try:
             image_data = image_data.numpy()
             if Mode.find("annotation") != -1:
                 image_data = image_data.reshape(image_data.shape[:2])
-                output_data = label2onehot(image_data, axis=2, DTYPE=output_data.dtype, labels=LABELS)
+                output_data = label2onehot(image_data, axis=2, DTYPE=image_data.dtype, labels=LABELS)
             else:
                 output_data = image_data
 
@@ -55,8 +55,8 @@ try:
         print("Done")
 
     print("\n\n\n")
-    print("train_image :", len(dataset_lists["train_image"]), dataset_lists["train_image"][0].shape, type(dataset_lists["train_image"][0]))
-    print("train_annotation :", len(dataset_lists["train_annotation"]), dataset_lists["train_annotation"][0].shape, type(dataset_lists["train_annotation"][0]))
+    # print("train_image :", len(dataset_lists["train_image"]), dataset_lists["train_image"][0].shape, type(dataset_lists["train_image"][0]))
+    # print("train_annotation :", len(dataset_lists["train_annotation"]), dataset_lists["train_annotation"][0].shape, type(dataset_lists["train_annotation"][0]))
     print("test_image :", len(dataset_lists["test_image"]), dataset_lists["test_image"][0].shape, type(dataset_lists["test_image"][0]))
     print("test_annotation :", len(dataset_lists["test_annotation"]), dataset_lists["test_annotation"][0].shape, type(dataset_lists["test_annotation"][0]))
 
@@ -64,22 +64,23 @@ try:
 
     # train_image_array = np.asarray(dataset_lists["train_image"], dtype=np.uint8)
     # train_annotation_array = np.asarray(dataset_lists["train_annotation"], dtype=np.uint8)
-    # test_image_array = np.asarray(dataset_lists["test_image"], dtype=np.uint8)
-    # test_annotation_array = np.asarray(dataset_lists["test_annotation"], dtype=np.uint8)
+    test_image_array = np.asarray(dataset_lists["test_image"], dtype=np.uint8)
+    test_annotation_array = np.asarray(dataset_lists["test_annotation"], dtype=np.uint8)
 
     print("Done")
 
-    # np.savez("scene_parse150_resize",
-    #          train_image=train_image_array,
-    #          train_annotation=train_annotation_array,
-    #          test_image=test_image_array,
-    #          test_annotation=test_annotation_array)
+    np.savez_compressed("scene_parse150_resize",
+                        # train_image=train_image_array,
+                        # train_annotation=train_annotation_array,
+                        test_image=test_image_array,
+                        test_annotation=test_annotation_array)
 
     print("Saved")
 
 except:
     import traceback
     traceback.print_exc()
+
 
 finally:
     print(">>")
