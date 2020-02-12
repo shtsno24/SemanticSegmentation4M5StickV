@@ -41,28 +41,24 @@ def create_scene_parse150_label_dict(path_to_file, object_file, file_format="jpg
     return index_palette
 
 
-def label2onehot(x, index_palette, DTYPE=np.uint8, print_log=False):
-    classes = len(index_palette)
-    shapes = x.shape[:2] + (classes,)
-    x_r = x[:, :, 0]
-    x_g = x[:, :, 1]
+def label2onehot(a, axis=0, DTYPE=np.uint8, labels=0):
+    # https://stackoverflow.com/questions/36960320/convert-a-2d-matrix-to-a-3d-one-hot-matrix-numpy/36960495 @ Approach #2
+    if labels is 0:
+        ncols = a.max()+1
+    else:
+        ncols = labels
+    grid = np.ogrid[tuple(map(slice, a.shape))]
+    grid.insert(axis, a)
 
-    output_array = np.zeros(shapes[:2], dtype=DTYPE)
-    output_array_buff = ((x_r).astype(np.uint16) / 10).astype(np.uint16) * 256 + x_g.astype(np.uint16)
-
-    if print_log is True:
-        for X in range(output_array_buff.shape[0]):
-            for Y in range(output_array_buff.shape[1]):
-                # print(X, Y)
-                if x[X][Y][0] != 0 or x[X][Y][2] != 0 or x[X][Y][2] != 0 :
-                    print(x[X][Y], output_array_buff[X][Y])
-                    # print(index_palette[output_array_buff[X][Y]])
-    return output_array_buff.astype(DTYPE)
+    out = np.zeros(a.shape + (ncols,), dtype=DTYPE)
+    out[tuple(grid)] = 1
+    return out
 
 
 if __name__ == "__main__":
     index_palette = create_scene_parse150_label_dict(FILE_PATH, OBJECT_FILE)
     print(index_palette)
-    x = np.zeros((112, 112, 3), dtype=np.uint8)
-    y = label2onehot(x, index_palette)
-    print(y.shape)
+    x = np.random.randint(0, 150, (112, 112), dtype=np.uint8)
+    y = label2onehot(x, axis=2)
+    print("array_match : ", np.array_equal(x, y.argmax(axis=2)))
+    print("shape x array : ", x.shape, " shape y array : ", y.shape)

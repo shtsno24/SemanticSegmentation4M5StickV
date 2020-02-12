@@ -4,3 +4,4 @@ data/scene_parse150_resize.npz
 *.zip
 /data/color150
 /data/ADEChallengeData2016
+__pycache__
