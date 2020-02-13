@@ -1,6 +1,5 @@
 import os
 import numpy as np
-# from tensorflow.image import resize_image_with_crop_or_pad, resize, ResizeMethod
 import tensorflow as tf
 from PIL import Image
 from Util import label2onehot, create_scene_parse150_label_dict
@@ -23,8 +22,8 @@ try:
 
     # Process image
     print("\n\n\nResizing Images...")
-    # for Mode in ("train_image", "train_annotation", "test_image", "test_annotation"):
-    for Mode in ("test_image", "test_annotation"):
+    for Mode in ("train_image", "train_annotation", "test_image", "test_annotation"):
+    # for Mode in ("test_image", "test_annotation"):
         file_list_buffer = os.listdir(image_file_directories[Mode])
         file_list = [f for f in file_list_buffer if os.path.isfile(image_file_directories[Mode] + f)]
         Data_num = len(file_list)
@@ -67,23 +66,34 @@ try:
         print("Done")
 
     print("\n\n\n")
-    # print("train_image :", len(dataset_lists["train_image"]), dataset_lists["train_image"][0].shape, type(dataset_lists["train_image"][0]))
-    # print("train_annotation :", len(dataset_lists["train_annotation"]), dataset_lists["train_annotation"][0].shape, type(dataset_lists["train_annotation"][0]))
+    print("train_image :", len(dataset_lists["train_image"]), dataset_lists["train_image"][0].shape, type(dataset_lists["train_image"][0]))
+    print("train_annotation :", len(dataset_lists["train_annotation"]), dataset_lists["train_annotation"][0].shape, type(dataset_lists["train_annotation"][0]))
     print("test_image :", len(dataset_lists["test_image"]), dataset_lists["test_image"][0].shape, type(dataset_lists["test_image"][0]))
     print("test_annotation :", len(dataset_lists["test_annotation"]), dataset_lists["test_annotation"][0].shape, type(dataset_lists["test_annotation"][0]))
 
     print("\n\n\nConvert to ndarray...   ", end="")
 
-    # train_image_array = np.asarray(dataset_lists["train_image"], dtype=np.uint8)
-    # train_annotation_array = np.asarray(dataset_lists["train_annotation"], dtype=np.uint8)
+    train_image_array = np.asarray(dataset_lists["train_image"], dtype=np.uint8)
+    train_annotation_array = np.asarray(dataset_lists["train_annotation"], dtype=np.uint8)
     test_image_array = np.asarray(dataset_lists["test_image"], dtype=np.uint8)
     test_annotation_array = np.asarray(dataset_lists["test_annotation"], dtype=np.uint8)
+
+    # shuffle data
+    train_p = np.random.permutation(train_image_array.shape[0])
+    train_image_array = train_image_array[train_p]
+    train_annotation_array = train_annotation_array[train_p]
+
+    test_p = np.random.permutation(test_image_array.shape[0])
+    test_image_array = test_image_array[test_p]
+    test_annotation_array = test_annotation_array[test_p]
+
+
 
     print("Done")
     print("\n\n\nConpressed data...   ", end="")
     np.savez_compressed("scene_parse150_resize",
-                        # train_image=train_image_array,
-                        # train_annotation=train_annotation_array,
+                        train_image=train_image_array,
+                        train_annotation=train_annotation_array,
                         test_image=test_image_array,
                         test_annotation=test_annotation_array)
 
