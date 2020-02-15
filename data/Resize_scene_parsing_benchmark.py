@@ -5,6 +5,7 @@ from PIL import Image
 from Util import label2onehot, create_scene_parse150_label_dict
 
 try:
+    tf.add(1, 1) # To show INFO
     CROP_HEIGHT = 112
     CROP_WIDTH = 112
     LABELS = 151
@@ -26,12 +27,17 @@ try:
     # for Mode in ("test_image", "test_annotation"):
         file_list_buffer = os.listdir(image_file_directories[Mode])
         file_list = [f for f in file_list_buffer if os.path.isfile(image_file_directories[Mode] + f)]
+        file_list.sort(key=str.lower)
         Data_num = len(file_list)
-        print(Mode, Data_num)
+        print(Mode, Data_num, ": ", end="")
         i = 0
         for f_name in file_list:
             raw_data = Image.open(image_file_directories[Mode] + f_name)
             image_data = np.array(raw_data, dtype=np.uint8)
+            if Mode.find("image") != -1 and image_data.ndim < 3:
+                raw_data = raw_data.convert("RGB")
+                image_data = np.array(raw_data, dtype=np.uint8)
+
             if i == SAMPLE:
                 pil_img = Image.fromarray(image_data)
                 pil_img.save(Mode + ".png")
@@ -66,17 +72,16 @@ try:
         print("Done")
 
     print("\n\n\n")
-    print("train_image :", len(dataset_lists["train_image"]), dataset_lists["train_image"][0].shape, type(dataset_lists["train_image"][0]))
-    print("train_annotation :", len(dataset_lists["train_annotation"]), dataset_lists["train_annotation"][0].shape, type(dataset_lists["train_annotation"][0]))
-    print("test_image :", len(dataset_lists["test_image"]), dataset_lists["test_image"][0].shape, type(dataset_lists["test_image"][0]))
-    print("test_annotation :", len(dataset_lists["test_annotation"]), dataset_lists["test_annotation"][0].shape, type(dataset_lists["test_annotation"][0]))
-
     print("\n\n\nConvert to ndarray...   ", end="")
-
     train_image_array = np.asarray(dataset_lists["train_image"], dtype=np.uint8)
     train_annotation_array = np.asarray(dataset_lists["train_annotation"], dtype=np.uint8)
     test_image_array = np.asarray(dataset_lists["test_image"], dtype=np.uint8)
     test_annotation_array = np.asarray(dataset_lists["test_annotation"], dtype=np.uint8)
+
+    print("train_image :", train_image_array.shape, train_image_array.dtype)
+    print("train_annotation :", train_annotation_array.shape, train_annotation_array.dtype)
+    print("test_image :", test_image_array.shape, test_image_array.dtype)
+    print("test_annotation :", test_annotation_array.shape, test_annotation_array.dtype)
 
     # shuffle data
     train_p = np.random.permutation(train_image_array.shape[0])
@@ -86,8 +91,6 @@ try:
     test_p = np.random.permutation(test_image_array.shape[0])
     test_image_array = test_image_array[test_p]
     test_annotation_array = test_annotation_array[test_p]
-
-
 
     print("Done")
     print("\n\n\nConpressed data...   ", end="")
