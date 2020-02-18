@@ -1,7 +1,7 @@
 get-pip.py
-data/scene_parse150_resize.npz
+__pycache__
 *.npz
 *.zip
 /data/color150
 /data/ADEChallengeData2016
-__pycache__
+/data/*.tfrecords
