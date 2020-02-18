@@ -55,6 +55,13 @@ def label2onehot(a, axis=0, DTYPE=np.uint8, labels=0):
     return out
 
 
+def get_file_list_from_directory(directory_name, sort_key=str.lower):
+    file_list_buffer = os.listdir(directory_name)
+    file_list = [f for f in file_list_buffer if os.path.isfile(directory_name + f)]
+    file_list.sort(key=sort_key)
+    return file_list, len(file_list)
+
+
 if __name__ == "__main__":
     index_palette = create_scene_parse150_label_dict(FILE_PATH, OBJECT_FILE)
     print(index_palette)

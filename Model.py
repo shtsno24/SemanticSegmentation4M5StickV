@@ -8,7 +8,7 @@ H x W x D : 112 x 112 x 3 -> 112 x 112 x (class)
 """
 
 
-def TestNet(input_shape=(112, 112, 3), classes=150):
+def TestNet(input_shape= (112, 112, 3), classes=151):
     inputs = Input(shape=input_shape)
 
     x = DepthwiseConv2D((3, 3), padding="same")(inputs)
@@ -51,7 +51,7 @@ def TestNet(input_shape=(112, 112, 3), classes=150):
     x = Conv2D(classes, (1, 1), activation="relu")(x)
     x = UpSampling2D(size=(2, 2))(x)
 
-    # 112 x 112 x 150
+    # 112 x 112 x 151
 
     x = Activation("softmax")(x)
 
