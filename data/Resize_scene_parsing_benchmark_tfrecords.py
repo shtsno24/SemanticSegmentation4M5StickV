@@ -73,21 +73,15 @@ try:
                 image_data = tf.image.resize_with_crop_or_pad(image_data, long_side, long_side)
                 image_data = tf.image.resize(image_data, (CROP_HEIGHT, CROP_WIDTH), method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
 
-                # Convert annotation_data to one-hot array
-                annotation_data = annotation_data.numpy()
-                annotation_data = annotation_data.reshape(annotation_data.shape[:2])
-                annotation_data = tf.one_hot(annotation_data, depth=LABELS)
+                # Reshape annotation_data
+                annotation_data = tf.reshape(annotation_data, annotation_data.shape[:2])
 
                 # Convert ndarray to raw format                
-                annotation_data = annotation_data.numpy().tostring()
-                image_data = image_data.numpy().tostring()
+                annotation_data = annotation_data.numpy().tobytes()
+                image_data = image_data.numpy().tobytes()
 
                 # Write to Record
                 feature = {
-                    "height": tf.train.Feature(int64_list=tf.train.Int64List(value=[CROP_HEIGHT])),
-                    "width": tf.train.Feature(int64_list=tf.train.Int64List(value=[CROP_WIDTH])),
-                    "labels": tf.train.Feature(int64_list=tf.train.Int64List(value=[LABELS])),
-                    "color_depth" : tf.train.Feature(int64_list=tf.train.Int64List(value=[COLOR_DEPTH])),
                     "annotation": tf.train.Feature(bytes_list=tf.train.BytesList(value=[annotation_data])),
                     "image": tf.train.Feature(bytes_list=tf.train.BytesList(value=[image_data]))
                 }
@@ -139,20 +133,14 @@ try:
                 image_data = tf.image.resize(image_data, (CROP_HEIGHT, CROP_WIDTH), method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
 
                 # Convert annotation_data to one-hot array
-                annotation_data = annotation_data.numpy()
-                annotation_data = annotation_data.reshape(annotation_data.shape[:2])
-                annotation_data = tf.one_hot(annotation_data, depth=LABELS)
+                annotation_data = tf.reshape(annotation_data, annotation_data.shape[:2])
 
                 # Convert ndarray to raw format                
-                annotation_data = annotation_data.numpy().tostring()
-                image_data = image_data.numpy().tostring()
+                annotation_data = annotation_data.numpy().tobytes()
+                image_data = image_data.numpy().tobytes()
 
                 # Write to Record
                 feature = {
-                    "height": tf.train.Feature(int64_list=tf.train.Int64List(value=[CROP_HEIGHT])),
-                    "width": tf.train.Feature(int64_list=tf.train.Int64List(value=[CROP_WIDTH])),
-                    "labels": tf.train.Feature(int64_list=tf.train.Int64List(value=[LABELS])),
-                    "color_depth" : tf.train.Feature(int64_list=tf.train.Int64List(value=[COLOR_DEPTH])),
                     "annotation": tf.train.Feature(bytes_list=tf.train.BytesList(value=[annotation_data])),
                     "image": tf.train.Feature(bytes_list=tf.train.BytesList(value=[image_data]))
                 }

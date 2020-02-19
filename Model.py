@@ -1,6 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Conv2D, DepthwiseConv2D, MaxPooling2D, UpSampling2D, Activation
+from tensorflow.keras.losses import sparse_categorical_crossentropy
 
 """
 もしかしたら，ResizeNearesetNeighbor，ResizeBilinear, TransposeConvが使えるかも．
@@ -53,7 +54,7 @@ def TestNet(input_shape= (112, 112, 3), classes=151):
 
     # 112 x 112 x 151
 
-    x = Activation("softmax")(x)
+    outputs = Activation("softmax")(x)
 
-    model = Model(inputs, x)
+    model = Model(inputs, outputs)
     return model

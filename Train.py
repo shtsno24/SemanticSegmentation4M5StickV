@@ -9,21 +9,24 @@ def parse_tfrecords(example, DTYPE=tf.float32):
 
     features = tf.io.parse_single_example(example,
                                           features={
-                                          'height': tf.io.FixedLenFeature([], tf.int64),
-                                          'width': tf.io.FixedLenFeature([], tf.int64),
                                           'annotation': tf.io.FixedLenFeature([], tf.string),
                                           'image': tf.io.FixedLenFeature([], tf.string),
                                           })
 
     height = 112
     width = 112
-    labels = 151
     color_depth = 3
 
     annotation_decoded = tf.io.decode_raw(features["annotation"], tf.uint8)
     image_decoded = tf.io.decode_raw(features["image"], tf.uint8)
 
-    return image_decoded, annotation_decoded
+    annotation_data = tf.reshape(annotation_decoded, (height, width))
+    image_data = tf.reshape(image_decoded, (height, width, color_depth))
+
+    annotation_data = tf.cast(annotation_data, dtype=DTYPE) / 255.0
+    image_data = tf.cast(image_data, dtype=DTYPE) / 255.0
+
+    return image_data, annotation_data
 
 
 try:
@@ -32,9 +35,13 @@ try:
 
     TRAIN_RECORDS = "./data/scene_parse150_resize_train.tfrecords"
     TEST_RECORDS = "./data/scene_parse150_resize_test.tfrecords"
-    BATCH_SIZE = 128
+    # BATCH_SIZE = 47 # or 43
+    BATCH_SIZE_TRAIN = 100
+    BATCH_SIZE_TEST = 100
     SHUFFLE_SIZE = 100
-    EPOCHS = 10
+    TRAIN_DATASET_SIZE = 20210
+    TEST_DATASET_SIZE = 2000
+    EPOCHS = 128
     LABELS = 151
     COLOR_DEPTH = 3
     CROP_HEIGHT = 112
@@ -51,34 +58,17 @@ try:
 
     # Load data from .tfrecords
     train_dataset = tf.data.TFRecordDataset(TEST_RECORDS)
-
     train_dataset = train_dataset.map(parse_tfrecords)
     train_dataset = train_dataset.shuffle(SHUFFLE_SIZE)
-    train_dataset = train_dataset.batch(BATCH_SIZE)
-    train_dataset = train_dataset.repeat(-1)
-    train_iterator = train_dataset.make_one_shot_iterator()
-
-    train_images, train_annotations = train_iterator.get_next()
-    train_annotations = tf.cast(train_annotations, dtype=tf.float32) / 255.0
-    train_images = tf.cast(train_images, dtype=tf.float32) / 255.0
-    train_annotations = tf.reshape(train_annotations, (-1, CROP_HEIGHT, CROP_WIDTH, LABELS))
-    train_images = tf.reshape(train_images, (-1, CROP_HEIGHT, CROP_WIDTH, COLOR_DEPTH))
-
+    train_dataset = train_dataset.batch(BATCH_SIZE_TRAIN)
+    train_dataset = train_dataset.repeat(10)
 
     test_dataset = tf.data.TFRecordDataset(TEST_RECORDS)
-
     test_dataset = test_dataset.map(parse_tfrecords)
-    test_dataset = test_dataset.batch(BATCH_SIZE)
-    test_dataset = test_dataset.repeat(-1)
-    test_iterator = test_dataset.make_one_shot_iterator()
+    test_dataset = test_dataset.batch(BATCH_SIZE_TEST)
+    test_dataset = test_dataset.repeat(10)
 
-    test_images, test_annotations = test_iterator.get_next()
-    test_annotations = tf.cast(test_annotations, dtype=tf.float32) / 255.0
-    test_images = tf.cast(test_images, dtype=tf.float32) / 255.0
-    test_annotations = tf.reshape(test_annotations, (-1, CROP_HEIGHT, CROP_WIDTH, LABELS))
-    test_images = tf.reshape(test_images, (-1, CROP_HEIGHT, CROP_WIDTH, COLOR_DEPTH))
-
-    print(train_images)
+    print(train_dataset)
 
     # image_feature_description = {
     #     'height': tf.io.FixedLenFeature([], tf.int64),
@@ -100,12 +90,12 @@ try:
     print("Load Model...\n\n")
     model = Model.TestNet()
     model.summary()
-    print("\n\nDone\n\n")
+    print("\nDone")
 
     # Train model
-    print("Train Model...", end="")
-    model.compile(loss="categorical_crossentropy", optimizer='adam', metrics=["accuracy"])
-    model.fit(train_dataset, epochs=EPOCHS, validation_data=test_dataset)
+    print("\n\nTrain Model...")
+    model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), optimizer='adadelta', metrics=["accuracy"])
+    model.fit(train_dataset, validation_data=test_dataset, epochs=EPOCHS, steps_per_epoch=int(TEST_DATASET_SIZE/BATCH_SIZE_TRAIN), validation_steps=int(TEST_DATASET_SIZE/BATCH_SIZE_TEST))
     model.save('TestNet.h5')
     print("  Done\n\n")
 
