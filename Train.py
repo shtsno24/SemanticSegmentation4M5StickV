@@ -4,6 +4,18 @@ from tensorflow import keras
 
 import Model
 
+# config = tf.compat.v1.ConfigProto()
+# config.gpu_options.allow_growth = True
+# session = tf.compat.v1.InteractiveSession(config=config)
+physical_devices = tf.config.experimental.list_physical_devices('GPU')
+if len(physical_devices) > 0:
+    for k in range(len(physical_devices)):
+        tf.config.experimental.set_memory_growth(physical_devices[k], True)
+        print('memory growth:', tf.config.experimental.get_memory_growth(physical_devices[k]))
+else:
+    print("Not enough GPU hardware devices available")
+
+
 
 def parse_tfrecords(example, DTYPE=tf.float32):
 
@@ -23,7 +35,7 @@ def parse_tfrecords(example, DTYPE=tf.float32):
     annotation_data = tf.reshape(annotation_decoded, (height, width))
     image_data = tf.reshape(image_decoded, (height, width, color_depth))
 
-    annotation_data = tf.cast(annotation_data, dtype=DTYPE) / 255.0
+    annotation_data = tf.cast(annotation_data, dtype=DTYPE)
     image_data = tf.cast(image_data, dtype=DTYPE) / 255.0
 
     return image_data, annotation_data
@@ -33,15 +45,17 @@ try:
     # PATH = "data/scene_parse150_resize.npz"
     # PATH = "data/scene_parse150_resize_test.npz"
 
-    TRAIN_RECORDS = "./data/scene_parse150_resize_train.tfrecords"
-    TEST_RECORDS = "./data/scene_parse150_resize_test.tfrecords"
-    # BATCH_SIZE = 47 # or 43
-    BATCH_SIZE_TRAIN = 100
+    # TRAIN_RECORDS = "./data/scene_parse150_resize_train.tfrecords"
+    # TEST_RECORDS = "./data/scene_parse150_resize_test.tfrecords"
+    TRAIN_RECORDS = "./scene_parse150_resize_train.tfrecords"
+    TEST_RECORDS = "./scene_parse150_resize_test.tfrecords"
+    BATCH_SIZE_TRAIN = 47 * 2 # or 43
+    # BATCH_SIZE_TRAIN = 100
     BATCH_SIZE_TEST = 100
     SHUFFLE_SIZE = 100
     TRAIN_DATASET_SIZE = 20210
     TEST_DATASET_SIZE = 2000
-    EPOCHS = 128
+    EPOCHS = 1000
     LABELS = 151
     COLOR_DEPTH = 3
     CROP_HEIGHT = 112
@@ -57,7 +71,7 @@ try:
     # print("  Done\n\n")
 
     # Load data from .tfrecords
-    train_dataset = tf.data.TFRecordDataset(TEST_RECORDS)
+    train_dataset = tf.data.TFRecordDataset(TRAIN_RECORDS)
     train_dataset = train_dataset.map(parse_tfrecords)
     train_dataset = train_dataset.shuffle(SHUFFLE_SIZE)
     train_dataset = train_dataset.batch(BATCH_SIZE_TRAIN)
@@ -95,7 +109,7 @@ try:
     # Train model
     print("\n\nTrain Model...")
     model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), optimizer='adadelta', metrics=["accuracy"])
-    model.fit(train_dataset, validation_data=test_dataset, epochs=EPOCHS, steps_per_epoch=int(TEST_DATASET_SIZE/BATCH_SIZE_TRAIN), validation_steps=int(TEST_DATASET_SIZE/BATCH_SIZE_TEST))
+    model.fit(train_dataset, validation_data=test_dataset, epochs=EPOCHS, steps_per_epoch=int(TRAIN_DATASET_SIZE/BATCH_SIZE_TRAIN), validation_steps=int(TEST_DATASET_SIZE/BATCH_SIZE_TEST))
     model.save('TestNet.h5')
     print("  Done\n\n")
 

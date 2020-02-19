@@ -15,9 +15,9 @@ try:
     SAMPLE = np.random.randint(30)
 
     FILE_PATH = "./color150/"
-    OBJECT_FILE = "objectinfo150.csv"
-    INDEX_PALETTE = create_scene_parse150_label_dict(FILE_PATH, OBJECT_FILE)
-
+    # OBJECT_FILE = "objectinfo150.csv"
+    # INDEX_PALETTE = create_scene_parse150_label_dict(FILE_PATH, OBJECT_FILE)
+    
     TRAIN_RECORDS = "scene_parse150_resize_train.tfrecords"
     TEST_RECORDS = "scene_parse150_resize_test.tfrecords"
 
@@ -92,7 +92,7 @@ try:
                 if status % 2 == 0:
                     if show_flag == 0:
                         show_flag = 1
-                        print("\033[F", "■" * int(status / 2), int(status), "%")  
+                        print("\033[F", int(status), "%|", "■" * int(status / 2))  
                 else:
                     show_flag = 0
 
@@ -151,7 +151,7 @@ try:
                 if status % 2 == 0:
                     if show_flag == 0:
                         show_flag = 1
-                        print("\033[F", "■" * int(status / 2), int(status), "%")  
+                        print("\033[F", int(status), "%|", "■" * int(status / 2))  
                 else:
                     show_flag = 0
 
