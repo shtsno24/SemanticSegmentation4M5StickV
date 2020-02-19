@@ -55,7 +55,7 @@ try:
     SHUFFLE_SIZE = 100
     TRAIN_DATASET_SIZE = 20210
     TEST_DATASET_SIZE = 2000
-    EPOCHS = 1000
+    EPOCHS = 100
     LABELS = 151
     COLOR_DEPTH = 3
     CROP_HEIGHT = 112
@@ -75,12 +75,12 @@ try:
     train_dataset = train_dataset.map(parse_tfrecords)
     train_dataset = train_dataset.shuffle(SHUFFLE_SIZE)
     train_dataset = train_dataset.batch(BATCH_SIZE_TRAIN)
-    train_dataset = train_dataset.repeat(10)
+    train_dataset = train_dataset.repeat(-1)
 
     test_dataset = tf.data.TFRecordDataset(TEST_RECORDS)
     test_dataset = test_dataset.map(parse_tfrecords)
     test_dataset = test_dataset.batch(BATCH_SIZE_TEST)
-    test_dataset = test_dataset.repeat(10)
+    test_dataset = test_dataset.repeat(-1)
 
     print(train_dataset)
 
@@ -108,8 +108,8 @@ try:
 
     # Train model
     print("\n\nTrain Model...")
-    model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(), optimizer='adam', metrics=["accuracy"])
-    model.fit(train_dataset, validation_data=test_dataset, epochs=EPOCHS, steps_per_epoch=int(TRAIN_DATASET_SIZE/BATCH_SIZE_TRAIN/2), validation_steps=int(TEST_DATASET_SIZE/BATCH_SIZE_TEST/2))
+    model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(), optimizer='adadelta', metrics=["accuracy"])
+    model.fit(train_dataset, validation_data=test_dataset, epochs=EPOCHS, steps_per_epoch=int(TRAIN_DATASET_SIZE/BATCH_SIZE_TRAIN), validation_steps=int(TEST_DATASET_SIZE/BATCH_SIZE_TEST))
     model.save('TestNet.h5')
     print("  Done\n\n")
 

@@ -54,6 +54,8 @@ def TestNet(input_shape= (112, 112, 3), classes=151):
 
     # 112 x 112 x 151
 
+    x = DepthwiseConv2D((3, 3), padding="same")(x)
+    x = Conv2D(classes, (1, 1))(x)
     outputs = Activation("softmax")(x)
 
     model = Model(inputs, outputs)
