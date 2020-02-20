@@ -5,3 +5,4 @@ __pycache__
 /data/color150
 /data/ADEChallengeData2016
 /data/*.tfrecords
+model_viewer.py

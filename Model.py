@@ -1,6 +1,6 @@
 import tensorflow as tf
 from tensorflow.keras.models import Model
-from tensorflow.keras.layers import Input, Conv2D, DepthwiseConv2D, MaxPooling2D, UpSampling2D, Activation, Concatenate
+from tensorflow.keras.layers import Input, Conv2D, DepthwiseConv2D, MaxPooling2D, UpSampling2D, Activation, Concatenate, BatchNormalization, Reshape
 from tensorflow.keras.losses import sparse_categorical_crossentropy
 
 """
@@ -69,7 +69,7 @@ def TestNet(input_shape= (112, 112, 3), classes=151):
 """
 
 
-def TestNet(input_shape= (112, 112, 3), classes=151):
+def TestNet(input_shape=(112, 112, 3), classes=151):
     inputs = Input(shape=input_shape)
 
     x0 = DepthwiseConv2D((3, 3), padding="same")(inputs)
@@ -109,7 +109,7 @@ def TestNet(input_shape= (112, 112, 3), classes=151):
     x1 = DepthwiseConv2D((7, 7), padding="same")(x)
     x = Concatenate()([x0, x1])
     x = Conv2D(128, (1, 1), activation="relu")(x)
-    x = UpSampling2D(size=(2, 2))(x)
+    x = UpSampling2D(size=(2, 2))(x)                # move UpSampling to top of this block
 
     # 28 x 28 x 128
 
@@ -117,7 +117,7 @@ def TestNet(input_shape= (112, 112, 3), classes=151):
     x1 = DepthwiseConv2D((7, 7), padding="same")(x)
     x = Concatenate()([x0, x1])
     x = Conv2D(64, (1, 1), activation="relu")(x)
-    x = UpSampling2D(size=(2, 2))(x)
+    x = UpSampling2D(size=(2, 2))(x)                # move UpSampling to top of this block
 
     # 56 x 56 x 64
 
@@ -125,11 +125,11 @@ def TestNet(input_shape= (112, 112, 3), classes=151):
     x1 = DepthwiseConv2D((7, 7), padding="same")(x)
     x = Concatenate()([x0, x1])
     x = Conv2D(64, (1, 1), activation="relu")(x)
-    x = UpSampling2D(size=(2, 2))(x)
+    x = UpSampling2D(size=(2, 2))(x)                # move UpSampling to top of this block
 
     # 112 x 112 x 151
     x = DepthwiseConv2D((3, 3), padding="same")(x)
-    x = Conv2D(classes, (1, 1), activation="relu")(x)
+    x = Conv2D(classes, (1, 1), activation="relu")(x)  # remove "relu"
     outputs = Activation("softmax")(x)
 
     model = Model(inputs, outputs)
@@ -139,46 +139,57 @@ def TestNet(input_shape= (112, 112, 3), classes=151):
 def TestNet2(input_shape=(112, 112, 3), classes=151):
     inputs = Input(shape=input_shape)
 
+    x_3 = DepthwiseConv2D((3, 3), padding="same")(inputs)
+    x_5 = DepthwiseConv2D((5, 5), padding="same")(inputs)
+    x_7 = DepthwiseConv2D((7, 7), padding="same")(inputs)
+    x_9 = DepthwiseConv2D((9, 9), padding="same")(inputs)
+    x = Concatenate()([inputs, x_3, x_5, x_7, x_9])
+    x = Conv2D(64, (1, 1), activation="relu")(x)
     x = MaxPooling2D(pool_size=(2, 2))(inputs)
-    x_3 = DepthwiseConv2D((3, 3), padding="same")(x)
-    x_5 = DepthwiseConv2D((5, 5), padding="same")(x)
-    x_7 = DepthwiseConv2D((7, 7), padding="same")(x)
-    x_9 = DepthwiseConv2D((9, 9), padding="same")(x)
-    x = Concatenate()([x, x_3, x_5, x_7, x_9])
-    x = Conv2D(64, (1, 1), activation="relu")(x)
 
     # 56 x 56 x 64
 
-    x = MaxPooling2D(pool_size=(2, 2))(x)
     x_3 = DepthwiseConv2D((3, 1), padding="same", activation="relu")(x)
     x_3 = DepthwiseConv2D((1, 3), padding="same", activation="relu")(x_3)
-    x_3 = Conv2D(64, (1, 1), activation="relu")(x_3)
+    # x_3 = Conv2D(128, (1, 1), activation="relu")(x_3)
     x_7 = DepthwiseConv2D((7, 1), padding="same", activation="relu")(x)
     x_7 = DepthwiseConv2D((1, 7), padding="same", activation="relu")(x_7)
-    x_7 = Conv2D(64, (1, 1), activation="relu")(x_7)
+    # x_7 = Conv2D(128, (1, 1), activation="relu")(x_7)
     x = Concatenate()([x, x_3, x_7])
     x = Conv2D(128, (1, 1), activation="relu")(x)
+    x = MaxPooling2D(pool_size=(2, 2))(x)
 
     # 28 x 28 x 128
 
-    x = MaxPooling2D(pool_size=(2, 2))(x)
     x_3 = DepthwiseConv2D((3, 1), padding="same", activation="relu")(x)
     x_3 = DepthwiseConv2D((1, 3), padding="same", activation="relu")(x_3)
-    x_3 = Conv2D(128, (1, 1), activation="relu")(x_3)
+    # x_3 = Conv2D(128, (1, 1), activation="relu")(x_3)
     x_7 = DepthwiseConv2D((7, 1), padding="same", activation="relu")(x)
     x_7 = DepthwiseConv2D((1, 7), padding="same", activation="relu")(x_7)
-    x_7 = Conv2D(128, (1, 1), activation="relu")(x_3)
+    # x_7 = Conv2D(128, (1, 1), activation="relu")(x_7)
     x = Concatenate()([x, x_3, x_7])
     x = Conv2D(256, (1, 1), activation="relu")(x)
+    x = MaxPooling2D(pool_size=(2, 2))(x)
 
     # 14 x 14 x 256
 
     x_3 = DepthwiseConv2D((3, 1), padding="same", activation="relu")(x)
     x_3 = DepthwiseConv2D((1, 3), padding="same", activation="relu")(x_3)
-    x_3 = Conv2D(256, (1, 1), activation="relu")(x_3)
+    # x_7 = Conv2D(256, (1, 1), activation="relu")(x_3)
     x_7 = DepthwiseConv2D((7, 1), padding="same", activation="relu")(x)
     x_7 = DepthwiseConv2D((1, 7), padding="same", activation="relu")(x_7)
-    x_7 = Conv2D(256, (1, 1), activation="relu")(x_3)
+    # x_7 = Conv2D(256, (1, 1), activation="relu")(x_7)
+    x = Concatenate()([x, x_3, x_7])
+    x = Conv2D(512, (1, 1), activation="relu")(x)
+
+    # 14 x 14 x 512
+
+    x_3 = DepthwiseConv2D((3, 1), padding="same", activation="relu")(x)
+    x_3 = DepthwiseConv2D((1, 3), padding="same", activation="relu")(x_3)
+    # x_7 = Conv2D(512, (1, 1), activation="relu")(x_3)
+    x_7 = DepthwiseConv2D((7, 1), padding="same", activation="relu")(x)
+    x_7 = DepthwiseConv2D((1, 7), padding="same", activation="relu")(x_7)
+    # x_7 = Conv2D(512, (1, 1), activation="relu")(x_7)
     x = Concatenate()([x, x_3, x_7])
     x = Conv2D(256, (1, 1), activation="relu")(x)
 
@@ -187,10 +198,10 @@ def TestNet2(input_shape=(112, 112, 3), classes=151):
     x = UpSampling2D(size=(2, 2))(x)
     x_3 = DepthwiseConv2D((3, 1), padding="same", activation="relu")(x)
     x_3 = DepthwiseConv2D((1, 3), padding="same", activation="relu")(x_3)
-    x_3 = Conv2D(256, (1, 1), activation="relu")(x_3)
+    # x_3 = Conv2D(256, (1, 1), activation="relu")(x_3)
     x_7 = DepthwiseConv2D((7, 1), padding="same", activation="relu")(x)
     x_7 = DepthwiseConv2D((1, 7), padding="same", activation="relu")(x_7)
-    x_7 = Conv2D(256, (1, 1), activation="relu")(x_3)
+    # x_7 = Conv2D(256, (1, 1), activation="relu")(x_7)
     x = Concatenate()([x, x_3, x_7])
     x = Conv2D(128, (1, 1), activation="relu")(x)
 
@@ -199,10 +210,10 @@ def TestNet2(input_shape=(112, 112, 3), classes=151):
     x = UpSampling2D(size=(2, 2))(x)
     x_3 = DepthwiseConv2D((3, 1), padding="same", activation="relu")(x)
     x_3 = DepthwiseConv2D((1, 3), padding="same", activation="relu")(x_3)
-    x_3 = Conv2D(128, (1, 1), activation="relu")(x_3)
+    # x_3 = Conv2D(128, (1, 1), activation="relu")(x_3)
     x_7 = DepthwiseConv2D((7, 1), padding="same", activation="relu")(x)
     x_7 = DepthwiseConv2D((1, 7), padding="same", activation="relu")(x_7)
-    x_7 = Conv2D(128, (1, 1), activation="relu")(x_3)
+    # x_7 = Conv2D(128, (1, 1), activation="relu")(x_7)
     x = Concatenate()([x, x_3, x_7])
     x = Conv2D(64, (1, 1), activation="relu")(x)
 
@@ -211,16 +222,67 @@ def TestNet2(input_shape=(112, 112, 3), classes=151):
     x = UpSampling2D(size=(2, 2))(x)
     x_3 = DepthwiseConv2D((3, 1), padding="same", activation="relu")(x)
     x_3 = DepthwiseConv2D((1, 3), padding="same", activation="relu")(x_3)
-    x_3 = Conv2D(64, (1, 1), activation="relu")(x_3)
+    # x_3 = Conv2D(64, (1, 1), activation="relu")(x_3)
     x_7 = DepthwiseConv2D((7, 1), padding="same", activation="relu")(x)
     x_7 = DepthwiseConv2D((1, 7), padding="same", activation="relu")(x_7)
-    x_7 = Conv2D(64, (1, 1), activation="relu")(x_3)
+    # x_7 = Conv2D(64, (1, 1), activation="relu")(x_7)
     x = Concatenate()([x, x_3, x_7])
-    x = Conv2D(classes, (1, 1), activation="relu")(x)
+    x = Conv2D(classes, (1, 1))(x)
 
     # 112 x 112 x classes
 
     outputs = Activation("softmax")(x)
 
     model = Model(inputs, outputs)
+    return model
+
+
+def TestNet3(input_shape=(112, 112, 3), classes=151):
+    # @ https://github.com/alexgkendall/SegNet-Tutorial/blob/master/Example_Models/bayesian_segnet_camvid.prototxt
+    img_input = Input(shape=input_shape)
+    x = img_input
+    # Encoder
+    x = Conv2D(64, (3, 3), padding="same")(x)
+    x = BatchNormalization()(x)
+    x = Activation("relu")(x)
+    x = MaxPooling2D(pool_size=(2, 2))(x)
+
+    x = Conv2D(128, (3, 3), padding="same")(x)
+    x = BatchNormalization()(x)
+    x = Activation("relu")(x)
+    x = MaxPooling2D(pool_size=(2, 2))(x)
+
+    x = Conv2D(256, (3, 3), padding="same")(x)
+    x = BatchNormalization()(x)
+    x = Activation("relu")(x)
+    x = MaxPooling2D(pool_size=(2, 2))(x)
+
+    x = Conv2D(512, (3, 3), padding="same")(x)
+    x = BatchNormalization()(x)
+    x = Activation("relu")(x)
+
+    # Decoder
+    x = Conv2D(512, (3, 3), padding="same")(x)
+    x = BatchNormalization()(x)
+    x = Activation("relu")(x)
+
+    x = UpSampling2D(size=(2, 2))(x)
+    x = Conv2D(256, (3, 3), padding="same")(x)
+    x = BatchNormalization()(x)
+    x = Activation("relu")(x)
+
+    x = UpSampling2D(size=(2, 2))(x)
+    x = Conv2D(128, (3, 3), padding="same")(x)
+    x = BatchNormalization()(x)
+    x = Activation("relu")(x)
+
+    x = UpSampling2D(size=(2, 2))(x)
+    x = Conv2D(64, (3, 3), padding="same")(x)
+    x = BatchNormalization()(x)
+    x = Activation("relu")(x)
+
+    x = Conv2D(classes, (1, 1), padding="valid")(x)
+    x = Reshape((input_shape[0] * input_shape[1], classes))(x)
+    x = Activation("softmax")(x)
+    model = Model(img_input, x)
     return model
