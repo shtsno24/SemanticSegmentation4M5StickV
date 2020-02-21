@@ -48,7 +48,7 @@ try:
     SHUFFLE_SIZE = 100
     TRAIN_DATASET_SIZE = 2913
     TEST_DATASET_SIZE = 1449
-    EPOCHS = 1000
+    EPOCHS = 100
     LABELS = 21
     COLOR_DEPTH = 3
     CROP_HEIGHT = 120
@@ -77,7 +77,7 @@ try:
 
     # Train model
     print("\n\nTrain Model...")
-    model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), optimizer='adadelta', metrics=["accuracy"])
+    model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), optimizer='adam', metrics=["accuracy"])
     model.fit(train_dataset, validation_data=test_dataset, epochs=EPOCHS,
               steps_per_epoch=int(TRAIN_DATASET_SIZE/BATCH_SIZE_TRAIN),
               validation_steps=int(TEST_DATASET_SIZE/BATCH_SIZE_TEST))
