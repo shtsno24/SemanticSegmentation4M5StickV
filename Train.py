@@ -44,7 +44,7 @@ try:
     # TEST_RECORDS = "./data/scene_parse150_resize_test.tfrecords"
     TRAIN_RECORDS = "./scene_parse150_resize_train.tfrecords"
     TEST_RECORDS = "./scene_parse150_resize_test.tfrecords"
-    BATCH_SIZE_TRAIN = 10 # 47 or 43
+    BATCH_SIZE_TRAIN = 2 # 47 or 43
     BATCH_SIZE_TEST = 100
     SHUFFLE_SIZE = 100
     TRAIN_DATASET_SIZE = 20210
@@ -79,7 +79,7 @@ try:
     # Train model
     print("\n\nTrain Model...")
     model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), optimizer='adam', metrics=["accuracy"])
-    model.fit(train_dataset, validation_data=test_dataset, epochs=EPOCHS, steps_per_epoch=int(TRAIN_DATASET_SIZE/BATCH_SIZE_TRAIN), validation_steps=int(TEST_DATASET_SIZE/BATCH_SIZE_TEST), shuffle=True)
+    model.fit(train_dataset, validation_data=test_dataset, epochs=EPOCHS, steps_per_epoch=int(TRAIN_DATASET_SIZE/BATCH_SIZE_TRAIN/10), validation_steps=int(TEST_DATASET_SIZE/BATCH_SIZE_TEST), shuffle=True)
     model.save('TestNet.h5')
     print("  Done\n\n")
 
