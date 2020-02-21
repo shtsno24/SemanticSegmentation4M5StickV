@@ -1,6 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Conv2D, DepthwiseConv2D, MaxPooling2D, UpSampling2D, Activation, Concatenate, BatchNormalization, Reshape
+from tensorflow.keras.layers import LeakyReLU
 from tensorflow.keras.losses import sparse_categorical_crossentropy
 
 """
@@ -285,4 +286,51 @@ def TestNet3(input_shape=(112, 112, 3), classes=151):
     x = Reshape((input_shape[0] * input_shape[1], classes))(x)
     x = Activation("softmax")(x)
     model = Model(img_input, x)
+    return model
+
+
+def TestNet4(input_shape=(416, 416, 3), classes=151):
+    inputs = Input(shape=input_shape)
+
+    x = Conv2D(16, (3, 3), padding="same")(inputs)
+    x = LeakyReLU()(x)
+    x = MaxPooling2D(pool_size=(2, 2))(x)
+
+    x = Conv2D(32, (3, 3), padding="same")(x)
+    x = LeakyReLU()(x)
+    x = MaxPooling2D(pool_size=(2, 2))(x)
+
+    x = Conv2D(64, (3, 3), padding="same")(x)
+    x = LeakyReLU()(x)
+    x = MaxPooling2D(pool_size=(2, 2))(x)
+
+    x = Conv2D(128, (3, 3), padding="same")(x)
+    x = LeakyReLU()(x)
+    x = MaxPooling2D(pool_size=(2, 2))(x)
+
+    # x = Conv2D(128, (3, 3), padding="same")(x)
+    # x = LeakyReLU()(x)
+    # x = MaxPooling2D(pool_size=(2, 2))(x)
+
+    x = Conv2D(256, (3, 3), padding="same")(x)
+    x = LeakyReLU()(x)
+    x = MaxPooling2D(pool_size=(2, 2))(x)
+
+    x = Conv2D(512, (3, 3), padding="same")(x)
+    x = LeakyReLU()(x)
+    x = MaxPooling2D(pool_size=(2, 2))(x)
+
+    x = Conv2D(1024, (3, 3), padding="same")(x)
+    x = LeakyReLU()(x)
+    x = MaxPooling2D(pool_size=(2, 2))(x)
+
+    x = Conv2D(1024, (3, 3), padding="same")(x)
+    x = LeakyReLU()(x)
+    x = MaxPooling2D(pool_size=(2, 2))(x)
+
+    x = Conv2D(125, (1, 1), padding="same")(x)
+    x = LeakyReLU()(x)
+
+    outputs = Activation("softmax")(x)
+    model = Model(inputs, outputs)
     return model
