@@ -44,7 +44,7 @@ try:
     TRAIN_RECORDS = "./VOC2012_resize_trainval.tfrecords"
     TEST_RECORDS = "./VOC2012_resize_val.tfrecords"
     BATCH_SIZE_TRAIN = 15
-    BATCH_SIZE_TEST = 100
+    BATCH_SIZE_TEST = 10
     SHUFFLE_SIZE = 100
     TRAIN_DATASET_SIZE = 2913
     TEST_DATASET_SIZE = 1449
