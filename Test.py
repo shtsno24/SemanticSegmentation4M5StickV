@@ -10,8 +10,8 @@ try:
     MODEL_FILE = "TestNet.h5"
     LABELS = 151
     COLOR_DEPTH = 3
-    CROP_HEIGHT = 112
-    CROP_WIDTH = 112
+    CROP_HEIGHT = 240
+    CROP_WIDTH = 320
 
     # Load data
     print("\n\nLoad data...\n")

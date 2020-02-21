@@ -4,12 +4,12 @@ import traceback
 import numpy as np
 import tensorflow as tf
 from PIL import Image
-from Util import label2onehot, create_scene_parse150_label_dict, get_file_list_from_directory
+from Util import create_scene_parse150_label_dict, get_file_list_from_directory
 
 try:
     tf.add(1, 1) # To show INFO
-    CROP_HEIGHT = 112
-    CROP_WIDTH = 112
+    CROP_HEIGHT = 240
+    CROP_WIDTH = 320
     LABELS = 151
     COLOR_DEPTH = 3
     SAMPLE = np.random.randint(30)

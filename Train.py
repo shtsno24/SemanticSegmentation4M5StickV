@@ -23,8 +23,8 @@ def parse_tfrecords(example, DTYPE=tf.float32):
                                           'image': tf.io.FixedLenFeature([], tf.string),
                                           })
 
-    height = 112
-    width = 112
+    height = 240
+    width = 320
     color_depth = 3
 
     annotation_decoded = tf.io.decode_raw(features["annotation"], tf.uint8)
@@ -34,7 +34,7 @@ def parse_tfrecords(example, DTYPE=tf.float32):
     image_data = tf.reshape(image_decoded, (height, width, color_depth))
 
     annotation_data = tf.cast(annotation_data, dtype=DTYPE)
-    image_data = (tf.cast(image_data, dtype=DTYPE) / 255.0) * 2.0 - 1.0
+    image_data = tf.cast(image_data, dtype=DTYPE) / 255.0
 
     return image_data, annotation_data
 
@@ -44,7 +44,7 @@ try:
     # TEST_RECORDS = "./data/scene_parse150_resize_test.tfrecords"
     TRAIN_RECORDS = "./scene_parse150_resize_train.tfrecords"
     TEST_RECORDS = "./scene_parse150_resize_test.tfrecords"
-    BATCH_SIZE_TRAIN = 47 # or 43
+    BATCH_SIZE_TRAIN = 10 # 47 or 43
     BATCH_SIZE_TEST = 100
     SHUFFLE_SIZE = 100
     TRAIN_DATASET_SIZE = 20210
@@ -52,8 +52,8 @@ try:
     EPOCHS = 100
     LABELS = 151
     COLOR_DEPTH = 3
-    CROP_HEIGHT = 112
-    CROP_WIDTH = 112
+    CROP_HEIGHT = 240
+    CROP_WIDTH = 320
 
     # Load data from .tfrecords
     print("Load dataset...\n\n")
@@ -79,7 +79,7 @@ try:
     # Train model
     print("\n\nTrain Model...")
     model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), optimizer='adam', metrics=["accuracy"])
-    model.fit(train_dataset, validation_data=test_dataset, epochs=EPOCHS, steps_per_epoch=int(TRAIN_DATASET_SIZE/BATCH_SIZE_TRAIN), validation_steps=int(TEST_DATASET_SIZE/BATCH_SIZE_TEST))
+    model.fit(train_dataset, validation_data=test_dataset, epochs=EPOCHS, steps_per_epoch=int(TRAIN_DATASET_SIZE/BATCH_SIZE_TRAIN), validation_steps=int(TEST_DATASET_SIZE/BATCH_SIZE_TEST), shuffle=True)
     model.save('TestNet.h5')
     print("  Done\n\n")
 

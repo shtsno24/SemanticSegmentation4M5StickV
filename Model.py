@@ -6,12 +6,12 @@ from tensorflow.keras.losses import sparse_categorical_crossentropy
 
 """
 もしかしたら，ResizeNearesetNeighbor，ResizeBilinear, TransposeConvが使えるかも．
-H x W x D : 112 x 112 x 3 -> 112 x 112 x (class)
+H x W x D : 240 x 320 x 3 -> 240 x 320 x (class)
 """
 
 
 """
-def TestNet(input_shape= (112, 112, 3), classes=151):
+def TestNet(input_shape=(240, 320, 3), classes=151):
     inputs = Input(shape=input_shape)
 
     x = DepthwiseConv2D((3, 3), padding="same")(inputs)
@@ -70,7 +70,7 @@ def TestNet(input_shape= (112, 112, 3), classes=151):
 """
 
 
-def TestNet(input_shape=(112, 112, 3), classes=151):
+def TestNet2(input_shape=(240, 320, 3), classes=151):
     inputs = Input(shape=input_shape)
 
     x0 = DepthwiseConv2D((3, 3), padding="same")(inputs)
@@ -137,100 +137,95 @@ def TestNet(input_shape=(112, 112, 3), classes=151):
     return model
 
 
-def TestNet2(input_shape=(112, 112, 3), classes=151):
+def TestNet(input_shape=(240, 320, 3), classes=151):
     inputs = Input(shape=input_shape)
 
     x_3 = DepthwiseConv2D((3, 3), padding="same")(inputs)
     x_5 = DepthwiseConv2D((5, 5), padding="same")(inputs)
     x_7 = DepthwiseConv2D((7, 7), padding="same")(inputs)
-    x_9 = DepthwiseConv2D((9, 9), padding="same")(inputs)
-    x = Concatenate()([inputs, x_3, x_5, x_7, x_9])
+    x = Concatenate()([x_3, x_5, x_7])
     x = Conv2D(64, (1, 1), activation="relu")(x)
     x = MaxPooling2D(pool_size=(2, 2))(inputs)
 
-    # 56 x 56 x 64
+    # 120 x 160 x 64
 
-    x_3 = DepthwiseConv2D((3, 1), padding="same", activation="relu")(x)
-    x_3 = DepthwiseConv2D((1, 3), padding="same", activation="relu")(x_3)
-    # x_3 = Conv2D(128, (1, 1), activation="relu")(x_3)
-    x_7 = DepthwiseConv2D((7, 1), padding="same", activation="relu")(x)
-    x_7 = DepthwiseConv2D((1, 7), padding="same", activation="relu")(x_7)
-    # x_7 = Conv2D(128, (1, 1), activation="relu")(x_7)
-    x = Concatenate()([x, x_3, x_7])
+    x_3 = DepthwiseConv2D((3, 3), padding="same")(x)
+    x_5 = DepthwiseConv2D((5, 5), padding="same")(x)
+    x_7 = DepthwiseConv2D((7, 7), padding="same")(x)
+    x = Concatenate()([x_3, x_5, x_7])
     x = Conv2D(128, (1, 1), activation="relu")(x)
     x = MaxPooling2D(pool_size=(2, 2))(x)
 
-    # 28 x 28 x 128
+    # 60 x 80 x 128
 
-    x_3 = DepthwiseConv2D((3, 1), padding="same", activation="relu")(x)
-    x_3 = DepthwiseConv2D((1, 3), padding="same", activation="relu")(x_3)
-    # x_3 = Conv2D(128, (1, 1), activation="relu")(x_3)
-    x_7 = DepthwiseConv2D((7, 1), padding="same", activation="relu")(x)
-    x_7 = DepthwiseConv2D((1, 7), padding="same", activation="relu")(x_7)
-    # x_7 = Conv2D(128, (1, 1), activation="relu")(x_7)
-    x = Concatenate()([x, x_3, x_7])
+    x_3 = DepthwiseConv2D((3, 3), padding="same")(x)
+    x_5 = DepthwiseConv2D((5, 5), padding="same")(x)
+    x = Concatenate()([x_3, x_5])
     x = Conv2D(256, (1, 1), activation="relu")(x)
     x = MaxPooling2D(pool_size=(2, 2))(x)
 
-    # 14 x 14 x 256
+    # 30 x 40 x 256
 
-    x_3 = DepthwiseConv2D((3, 1), padding="same", activation="relu")(x)
-    x_3 = DepthwiseConv2D((1, 3), padding="same", activation="relu")(x_3)
-    # x_7 = Conv2D(256, (1, 1), activation="relu")(x_3)
-    x_7 = DepthwiseConv2D((7, 1), padding="same", activation="relu")(x)
-    x_7 = DepthwiseConv2D((1, 7), padding="same", activation="relu")(x_7)
-    # x_7 = Conv2D(256, (1, 1), activation="relu")(x_7)
-    x = Concatenate()([x, x_3, x_7])
-    x = Conv2D(512, (1, 1), activation="relu")(x)
+    x_3 = DepthwiseConv2D((3, 3), padding="same")(x)
+    x_5 = DepthwiseConv2D((5, 5), padding="same")(x)
+    x = Concatenate()([x_3, x_5])
+    x = Conv2D(256, (1, 1), activation="relu")(x)
+    x = MaxPooling2D(pool_size=(2, 2))(x)
 
-    # 14 x 14 x 512
+    # 15 x 20 x 256
 
-    x_3 = DepthwiseConv2D((3, 1), padding="same", activation="relu")(x)
-    x_3 = DepthwiseConv2D((1, 3), padding="same", activation="relu")(x_3)
-    # x_7 = Conv2D(512, (1, 1), activation="relu")(x_3)
-    x_7 = DepthwiseConv2D((7, 1), padding="same", activation="relu")(x)
-    x_7 = DepthwiseConv2D((1, 7), padding="same", activation="relu")(x_7)
-    # x_7 = Conv2D(512, (1, 1), activation="relu")(x_7)
-    x = Concatenate()([x, x_3, x_7])
+    x_3 = DepthwiseConv2D((3, 3), padding="same")(x)
+    x_5 = DepthwiseConv2D((5, 5), padding="same")(x)
+    x = Concatenate()([x_3, x_5])
     x = Conv2D(256, (1, 1), activation="relu")(x)
 
-    # 14 x 14 x 256
+    # 15 x 20 x 256
+
+    x_3 = DepthwiseConv2D((3, 3), padding="same")(x)
+    x_5 = DepthwiseConv2D((5, 5), padding="same")(x)
+    x = Concatenate()([x_3, x_5])
+    x = Conv2D(256, (1, 1), activation="relu")(x)
+
+    # 15 x 20 x 256
+
+    x_3 = DepthwiseConv2D((3, 3), padding="same")(x)
+    x_5 = DepthwiseConv2D((5, 5), padding="same")(x)
+    x = Concatenate()([x_3, x_5])
+    x = Conv2D(256, (1, 1), activation="relu")(x)
+
+    # 15 x 20 x 256
 
     x = UpSampling2D(size=(2, 2))(x)
-    x_3 = DepthwiseConv2D((3, 1), padding="same", activation="relu")(x)
-    x_3 = DepthwiseConv2D((1, 3), padding="same", activation="relu")(x_3)
-    # x_3 = Conv2D(256, (1, 1), activation="relu")(x_3)
-    x_7 = DepthwiseConv2D((7, 1), padding="same", activation="relu")(x)
-    x_7 = DepthwiseConv2D((1, 7), padding="same", activation="relu")(x_7)
-    # x_7 = Conv2D(256, (1, 1), activation="relu")(x_7)
-    x = Concatenate()([x, x_3, x_7])
+    x_3 = DepthwiseConv2D((3, 3), padding="same")(x)
+    x_5 = DepthwiseConv2D((5, 5), padding="same")(x)
+    x = Concatenate()([x_3, x_5])
+    x = Conv2D(256, (1, 1), activation="relu")(x)
+
+    # 30 x 40 x 256
+
+    x = UpSampling2D(size=(2, 2))(x)
+    x_3 = DepthwiseConv2D((3, 3), padding="same")(x)
+    x_5 = DepthwiseConv2D((5, 5), padding="same")(x)
+    x = Concatenate()([x_3, x_5])
     x = Conv2D(128, (1, 1), activation="relu")(x)
 
-    # 28 x 28 x 128
+    # 60 x 80 x 128
 
     x = UpSampling2D(size=(2, 2))(x)
-    x_3 = DepthwiseConv2D((3, 1), padding="same", activation="relu")(x)
-    x_3 = DepthwiseConv2D((1, 3), padding="same", activation="relu")(x_3)
-    # x_3 = Conv2D(128, (1, 1), activation="relu")(x_3)
-    x_7 = DepthwiseConv2D((7, 1), padding="same", activation="relu")(x)
-    x_7 = DepthwiseConv2D((1, 7), padding="same", activation="relu")(x_7)
-    # x_7 = Conv2D(128, (1, 1), activation="relu")(x_7)
-    x = Concatenate()([x, x_3, x_7])
+    x_3 = DepthwiseConv2D((3, 3), padding="same")(x)
+    x_5 = DepthwiseConv2D((5, 5), padding="same")(x)
+    x = Concatenate()([x_3, x_5])
     x = Conv2D(64, (1, 1), activation="relu")(x)
 
-    # 56 x 56 x 64
+    # 120 x 160 x 64
 
     x = UpSampling2D(size=(2, 2))(x)
-    x_3 = DepthwiseConv2D((3, 1), padding="same", activation="relu")(x)
-    x_3 = DepthwiseConv2D((1, 3), padding="same", activation="relu")(x_3)
-    # x_3 = Conv2D(64, (1, 1), activation="relu")(x_3)
-    x_7 = DepthwiseConv2D((7, 1), padding="same", activation="relu")(x)
-    x_7 = DepthwiseConv2D((1, 7), padding="same", activation="relu")(x_7)
-    # x_7 = Conv2D(64, (1, 1), activation="relu")(x_7)
-    x = Concatenate()([x, x_3, x_7])
+    x_3 = DepthwiseConv2D((3, 3), padding="same")(x)
+    x_5 = DepthwiseConv2D((5, 5), padding="same")(x)
+    x = Concatenate()([x_3, x_5])
     x = Conv2D(classes, (1, 1))(x)
 
-    # 112 x 112 x classes
+    # 240 x 320 x classes
 
     outputs = Activation("softmax")(x)
 
@@ -238,7 +233,7 @@ def TestNet2(input_shape=(112, 112, 3), classes=151):
     return model
 
 
-def TestNet3(input_shape=(112, 112, 3), classes=151):
+def TestNet3(input_shape=(240, 320, 3), classes=151):
     # @ https://github.com/alexgkendall/SegNet-Tutorial/blob/master/Example_Models/bayesian_segnet_camvid.prototxt
     img_input = Input(shape=input_shape)
     x = img_input
@@ -289,7 +284,7 @@ def TestNet3(input_shape=(112, 112, 3), classes=151):
     return model
 
 
-def TestNet4(input_shape=(416, 416, 3), classes=151):
+def TestNet4(input_shape=(240, 320, 3), classes=151):
     inputs = Input(shape=input_shape)
 
     x = Conv2D(16, (3, 3), padding="same")(inputs)
