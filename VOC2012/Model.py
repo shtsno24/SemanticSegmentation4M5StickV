@@ -1,7 +1,8 @@
 import tensorflow as tf
 from tensorflow.keras.models import Model
-from tensorflow.keras.layers import Input, Conv2D, DepthwiseConv2D, MaxPooling2D, UpSampling2D, Activation, Concatenate, BatchNormalization, Reshape
-from tensorflow.keras.layers import LeakyReLU
+from tensorflow.keras.layers import Input, Conv2D, DepthwiseConv2D, MaxPooling2D
+from tensorflow.keras.layers import UpSampling2D, Activation, Concatenate, BatchNormalization, Reshape
+from tensorflow.keras.layers import LeakyReLU, Add
 from tensorflow.keras.losses import sparse_categorical_crossentropy
 
 """
@@ -16,7 +17,7 @@ def TestNet(input_shape=(120, 160, 3), classes=21):
     x_3 = DepthwiseConv2D((3, 3), padding="same")(inputs)
     x_5 = DepthwiseConv2D((5, 5), padding="same")(inputs)
     x_7 = DepthwiseConv2D((7, 7), padding="same")(inputs)
-    x = Concatenate()([x_3, x_5, x_7])
+    x = Add()([x_3, x_5, x_7])
     x = Conv2D(64, (1, 1), activation="relu")(x)
     x = DepthwiseConv2D((3, 3), padding="same")(x)
     x = Conv2D(64, (1, 1))(x)
