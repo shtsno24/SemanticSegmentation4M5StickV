@@ -21,8 +21,8 @@ def TestNet(input_shape=(120, 160, 3), classes=21):
     x = DepthwiseConv2D((3, 3), padding="same")(x)
     x = Conv2D(64, (1, 1))(x)
     x = BatchNormalization()(x)
-    x = Activation("relu")(x)
-    x = MaxPooling2D(pool_size=(2, 2))(x)
+    x0 = Activation("relu")(x)
+    x = MaxPooling2D(pool_size=(2, 2))(x0)
 
     # 60 x 80 x 64
 
@@ -31,8 +31,8 @@ def TestNet(input_shape=(120, 160, 3), classes=21):
     x = DepthwiseConv2D((3, 3), padding="same")(x)
     x = Conv2D(128, (1, 1))(x)
     x = BatchNormalization()(x)
-    x = Activation("relu")(x)
-    x = MaxPooling2D(pool_size=(2, 2))(x)
+    x1 = Activation("relu")(x)
+    x = MaxPooling2D(pool_size=(2, 2))(x1)
 
     # 30 x 40 x 128
 
@@ -41,8 +41,8 @@ def TestNet(input_shape=(120, 160, 3), classes=21):
     x = DepthwiseConv2D((3, 3), padding="same")(x)
     x = Conv2D(256, (1, 1))(x)
     x = BatchNormalization()(x)
-    x = Activation("relu")(x)
-    x = MaxPooling2D(pool_size=(2, 2))(x)
+    x2 = Activation("relu")(x)
+    x = MaxPooling2D(pool_size=(2, 2))(x2)
 
     # 15 x 20 x 256
 
@@ -59,14 +59,16 @@ def TestNet(input_shape=(120, 160, 3), classes=21):
     # 15 x 20 x 256
 
     x = UpSampling2D(size=(2, 2))(x)
+    x = Concatenate()([x, x2])
     x = DepthwiseConv2D((3, 3), padding="same")(x)
-    x = Conv2D(64, (1, 1))(x)
+    x = Conv2D(128, (1, 1))(x)
     x = BatchNormalization()(x)
     x = Activation("relu")(x)
 
     # 30 x 40 x 128
 
     x = UpSampling2D(size=(2, 2))(x)
+    x = Concatenate()([x, x1])
     x = DepthwiseConv2D((3, 3), padding="same")(x)
     x = Conv2D(64, (1, 1))(x)
     x = BatchNormalization()(x)
@@ -75,6 +77,7 @@ def TestNet(input_shape=(120, 160, 3), classes=21):
     # 60 x 80 x 64
 
     x = UpSampling2D(size=(2, 2))(x)
+    x = Concatenate()([x, x0])
     x = DepthwiseConv2D((3, 3), padding="same")(x)
     x = Conv2D(256, (1, 1))(x)
 
