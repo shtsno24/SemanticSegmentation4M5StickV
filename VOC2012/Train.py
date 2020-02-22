@@ -32,7 +32,7 @@ def parse_tfrecords(example, DTYPE=tf.float32):
     annotation_data = tf.reshape(annotation_decoded, (height, width))
     image_data = tf.reshape(image_decoded, (height, width, color_depth))
 
-    annotation_data = tf.cast(annotation_data, dtype=DTYPE)
+    # annotation_data = tf.cast(annotation_data, dtype=tf.uint8)
     image_data = tf.cast(image_data, dtype=DTYPE) / 255.0
 
     return image_data, annotation_data
@@ -48,11 +48,14 @@ try:
     SHUFFLE_SIZE = 100
     TRAIN_DATASET_SIZE = 2913
     TEST_DATASET_SIZE = 1449
-    EPOCHS = 500
+    EPOCHS = 5
     LABELS = 21
     COLOR_DEPTH = 3
     CROP_HEIGHT = 120
     CROP_WIDTH = 160
+    CLASS_PIXELS = np.array([182014429, 1780580, 758311, 2232247, 1514260, 1517186, 4375622, 3494749, 6752515, 2861091, 2060925, 3381632, 4344951, 2283739, 2888641, 11995853, 1670340, 2254463, 3612229, 3984238, 2349235])
+    CLASS_WEIGHS = (CLASS_PIXELS / np.sum(CLASS_PIXELS))
+    CLASS_WEIGHS = (CLASS_WEIGHS - np.min(CLASS_WEIGHS)) / (np.max(CLASS_WEIGHS) - np.min(CLASS_WEIGHS)) + 0.01
 
     # Load data from .tfrecords
     print("Load dataset...\n\n")
@@ -77,10 +80,12 @@ try:
 
     # Train model
     print("\n\nTrain Model...")
+    print(CLASS_WEIGHS)
     model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), optimizer='adam', metrics=["accuracy"])
     model.fit(train_dataset, validation_data=test_dataset, epochs=EPOCHS,
               steps_per_epoch=int(TRAIN_DATASET_SIZE/BATCH_SIZE_TRAIN),
-              validation_steps=int(TEST_DATASET_SIZE/BATCH_SIZE_TEST))
+              validation_steps=int(TEST_DATASET_SIZE/BATCH_SIZE_TEST),
+              class_weight=CLASS_WEIGHS)
     model.save('TestNet_VOC2012.h5')
     print("  Done\n\n")
 

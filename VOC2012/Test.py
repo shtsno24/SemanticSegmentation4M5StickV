@@ -5,8 +5,8 @@ from PIL import Image
 
 try:
 
-    TEST_IMAGE = "./data/JPEGImages/2007_000033.jpg"
-    TEST_ANNOTATION = "./data/SegmentationClass/2007_000033.png"
+    TEST_IMAGE = "./data/JPEGImages/2007_000733.jpg"
+    TEST_ANNOTATION = "./data/SegmentationClass/2007_000733.png"
     MODEL_FILE = "TestNet_VOC2012.h5"
     LABELS = 21
     COLOR_DEPTH = 3
@@ -20,6 +20,7 @@ try:
         annotation_data = annotation_data.reshape(annotation_data.shape + (1,))
         annotation_data[annotation_data == 255] = 0
         palette = np.array(annotation_object.getpalette(), dtype=np.uint8).reshape(-1, 3)
+        palette[21] = 255
     with Image.open(TEST_IMAGE) as image_object:
         image_object = image_object.convert("RGB")
         image_data = np.array(image_object, dtype=np.uint8)
@@ -48,8 +49,8 @@ try:
     print("\n\nPrediction...\n")
     image_data = tf.cast(image_data, tf.float32) / 255.0
     prediction_data = model.predict(image_data)
-    prediction_data = tf.argmax(prediction_data, axis=3)
-    prediction_data = tf.reshape(prediction_data, [CROP_HEIGHT, CROP_WIDTH])
+    prediction_data = tf.reshape(prediction_data, [CROP_HEIGHT, CROP_WIDTH, LABELS])
+    prediction_data = tf.argmax(prediction_data, axis=2)
     image_data = tf.cast(image_data, tf.float32) * 255.0
     print(prediction_data.shape, "\nDone")
 

@@ -1,6 +1,6 @@
 import tensorflow as tf
 from tensorflow.keras.models import Model
-from tensorflow.keras.layers import Input, Conv2D, DepthwiseConv2D, MaxPooling2D, UpSampling2D, Activation, Concatenate, BatchNormalization, Reshape
+from tensorflow.keras.layers import Input, Conv2D, DepthwiseConv2D, MaxPooling2D, UpSampling2D, Activation, Concatenate, BatchNormalization, Reshape, Add
 from tensorflow.keras.layers import LeakyReLU
 from tensorflow.keras.losses import sparse_categorical_crossentropy
 
@@ -79,16 +79,15 @@ def TestNet(input_shape=(120, 160, 3), classes=21):
     x = UpSampling2D(size=(2, 2))(x)
     x = Concatenate()([x, x0])
     x = DepthwiseConv2D((3, 3), padding="same")(x)
-    x = Conv2D(256, (1, 1))(x)
+    x = Conv2D(classes, (1, 1))(x)
 
     # 120 x 160 x classes
-
     outputs = Activation("softmax")(x)
 
     model = Model(inputs, outputs)
     return model
 
-def TestNet3(input_shape=(120, 160, 3), classes=151):
+def TestNet3(input_shape=(120, 160, 3), classes=21):
     # @ https://github.com/alexgkendall/SegNet-Tutorial/blob/master/Example_Models/bayesian_segnet_camvid.prototxt
     img_input = Input(shape=input_shape)
     x = img_input
@@ -133,12 +132,11 @@ def TestNet3(input_shape=(120, 160, 3), classes=151):
     x = Activation("relu")(x)
 
     x = Conv2D(classes, (1, 1), padding="valid")(x)
-    x = Reshape((input_shape[0] * input_shape[1], classes))(x)
     x = Activation("softmax")(x)
     model = Model(img_input, x)
     return model
 
-def TestNet4(input_shape=(120, 160, 3), classes=151):
+def TestNet4(input_shape=(120, 160, 3), classes=21):
     inputs = Input(shape=input_shape)
 
     x = Conv2D(16, (3, 3), padding="same")(inputs)

@@ -11,7 +11,7 @@ try:
     tf.add(1, 1) # To show INFO
     CROP_HEIGHT = 120
     CROP_WIDTH = 160
-    LABELS = 20
+    LABELS = 21
     COLOR_DEPTH = 3
     SAMPLE = np.random.randint(30)
 
@@ -38,6 +38,7 @@ try:
                     image_file_name = image_file_directories["image"] + name[0] + ".jpg"
                     annotation_file_name = image_file_directories["annotation"] + name[0] + ".png"
                     with Image.open(image_file_name) as image_object:
+                        image_object.convert("RGB")
                         image_data = np.array(image_object, dtype=np.uint8)
                     with Image.open(annotation_file_name) as annotation_object:
                         annotation_data = np.array(annotation_object, dtype=np.uint8)
@@ -45,7 +46,7 @@ try:
                         annotation_data[annotation_data == 255] = 0
                         if i == 0:
                             palette = np.array(annotation_object.getpalette(), dtype=np.uint8).reshape(-1, 3)
-
+                            palette[21] = 255
                     # Resizeing data
                     X, Y = image_data.shape[0], image_data.shape[1]
                     if X < Y:
@@ -55,7 +56,7 @@ try:
                     annotation_data = tf.image.resize_with_crop_or_pad(annotation_data, long_side, long_side)
                     annotation_data = tf.image.resize(annotation_data, (CROP_HEIGHT, CROP_WIDTH), method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
                     image_data = tf.image.resize_with_crop_or_pad(image_data, long_side, long_side)
-                    image_data = tf.image.resize(image_data, (CROP_HEIGHT, CROP_WIDTH), method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
+                    image_data = tf.image.resize(image_data, (CROP_HEIGHT, CROP_WIDTH), method=tf.image.ResizeMethod.LANCZOS5)
 
                     # Reshape annotation_data
                     annotation_data = tf.reshape(annotation_data, annotation_data.shape[:2])
@@ -106,6 +107,7 @@ try:
                     image_file_name = image_file_directories["image"] + name[0] + ".jpg"
                     annotation_file_name = image_file_directories["annotation"] + name[0] + ".png"
                     with Image.open(image_file_name) as image_object:
+                        image_object.convert("RGB")
                         image_data = np.array(image_object, dtype=np.uint8)
                     with Image.open(annotation_file_name) as annotation_object:
                         annotation_data = np.array(annotation_object, dtype=np.uint8)
@@ -113,6 +115,7 @@ try:
                         annotation_data[annotation_data == 255] = 0
                         if i == 0:
                             palette = np.array(annotation_object.getpalette(), dtype=np.uint8).reshape(-1, 3)
+                            palette[21] = 255
 
                     # Resizeing data
                     X, Y = image_data.shape[0], image_data.shape[1]
@@ -167,6 +170,7 @@ try:
                     image_file_name = image_file_directories["image"] + name[0] + ".jpg"
                     annotation_file_name = image_file_directories["annotation"] + name[0] + ".png"
                     with Image.open(image_file_name) as image_object:
+                        image_object.convert("RGB")
                         image_data = np.array(image_object, dtype=np.uint8)
                     with Image.open(annotation_file_name) as annotation_object:
                         annotation_data = np.array(annotation_object, dtype=np.uint8)
@@ -174,6 +178,7 @@ try:
                         annotation_data[annotation_data == 255] = 0
                         if i == 0:
                             palette = np.array(annotation_object.getpalette(), dtype=np.uint8).reshape(-1, 3)
+                            palette[21] = 255
 
                     # Resizeing data
                     X, Y = image_data.shape[0], image_data.shape[1]
