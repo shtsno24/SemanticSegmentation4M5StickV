@@ -20,7 +20,7 @@ try:
     TEST_RECORDS = "./data/VOC2012_resize_val.npz"
     # TRAIN_RECORDS = "./VOC2012_resize_train.npz"
     # TEST_RECORDS = "./VOC2012_resize_val.npz"
-    BATCH_SIZE = 15
+    BATCH_SIZE = 12
     SHUFFLE_SIZE = 100
     TRAIN_DATASET_SIZE = 1464
     TEST_DATASET_SIZE = 1450
@@ -40,7 +40,7 @@ try:
     image_data = image_data.astype(np.float32)
     image_data /= 255.0
     train_dataset = tf.data.Dataset.from_tensor_slices((image_data, annotation_data))
-    train_dataset = train_dataset.shuffle(SHUFFLE_SIZE).batch(BATCH_SIZE)
+    train_dataset = train_dataset.shuffle(SHUFFLE_SIZE).batch(BATCH_SIZE).repeat(-1)
     image_freq = label_balance_array_resize / label_pixel_count_array_resize
     CLASS_WEIGHT = {i: np.median(image_freq) / image_freq for i in range(LABELS)}
     print(train_dataset)
@@ -51,7 +51,7 @@ try:
     image_data = image_data.astype(np.float32)
     image_data /= 255.0
     test_dataset = tf.data.Dataset.from_tensor_slices((image_data, annotation_data))
-    test_dataset = test_dataset.batch(BATCH_SIZE)
+    test_dataset = test_dataset.batch(BATCH_SIZE).repeat(-1)
     print(test_dataset, "\n\nDone")
 
     # Load model
@@ -62,10 +62,10 @@ try:
 
     # Train model
     print("\n\nTrain Model...")
-    model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), optimizer='adam', metrics=["accuracy"])
+    model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), optimizer='adam', metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
     model.fit(train_dataset, validation_data=test_dataset, epochs=EPOCHS,
-              steps_per_epoch=int(TRAIN_DATASET_SIZE / BATCH_SIZE / EPOCHS),
-              validation_steps=int(TEST_DATASET_SIZE / BATCH_SIZE / EPOCHS),
+              steps_per_epoch=int(TRAIN_DATASET_SIZE / BATCH_SIZE),
+              validation_steps=int(TEST_DATASET_SIZE / BATCH_SIZE),
               class_weight=CLASS_WEIGHT)
     model.save('TestNet_VOC2012_npz.h5')
     print("  Done\n\n")
