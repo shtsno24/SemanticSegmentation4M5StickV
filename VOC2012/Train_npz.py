@@ -36,11 +36,13 @@ try:
         image_data = f["image"]
         annotation_data = f["annotation"]
         label_balance_array_resize = f["label_pix_resize"]
+        label_pixel_count_array_resize = f["label_pix_cnt_resize"]
     image_data = image_data.astype(np.float32)
     image_data /= 255.0
     train_dataset = tf.data.Dataset.from_tensor_slices((image_data, annotation_data))
     train_dataset = train_dataset.shuffle(SHUFFLE_SIZE).batch(BATCH_SIZE)
-    CLASS_WEIGHT = {i: (1 / label_balance_array_resize[i]) * (np.sum(label_balance_array_resize) / LABELS) for i in range(LABELS)}
+    image_freq = label_balance_array_resize / label_pixel_count_array_resize
+    CLASS_WEIGHT = {i: np.median(image_freq) / image_freq for i in range(LABELS)}
     print(train_dataset)
 
     with np.load(TEST_RECORDS) as f:
