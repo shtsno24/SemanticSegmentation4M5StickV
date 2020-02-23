@@ -22,8 +22,8 @@ try:
     # TEST_RECORDS = "./VOC2012_resize_val.npz"
     BATCH_SIZE = 12
     SHUFFLE_SIZE = 100
-    TRAIN_DATASET_SIZE = 1464
-    TEST_DATASET_SIZE = 1450
+    TRAIN_DATASET_SIZE = 1464 * 2
+    TEST_DATASET_SIZE = 1450 * 2
     EPOCHS = 10
     LABELS = 21
     COLOR_DEPTH = 3
@@ -64,8 +64,8 @@ try:
     print("\n\nTrain Model...")
     model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), optimizer='adam', metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
     model.fit(train_dataset, validation_data=test_dataset, epochs=EPOCHS,
-              steps_per_epoch=int(TRAIN_DATASET_SIZE / BATCH_SIZE),
-              validation_steps=int(TEST_DATASET_SIZE / BATCH_SIZE),
+              steps_per_epoch=int(TRAIN_DATASET_SIZE / BATCH_SIZE / EPOCHS),
+              validation_steps=int(TEST_DATASET_SIZE / BATCH_SIZE / EPOCHS),
               class_weight=CLASS_WEIGHT)
     model.save('TestNet_VOC2012_npz.h5')
     print("  Done\n\n")

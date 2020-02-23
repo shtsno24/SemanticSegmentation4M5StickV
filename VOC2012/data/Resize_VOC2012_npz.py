@@ -5,10 +5,10 @@ import traceback
 import numpy as np
 import tensorflow as tf
 from PIL import Image
-from Util import get_file_list_from_directory
+
 
 try:
-    tf.add(1, 1) # To show INFO
+    tf.add(1, 1)  # To show INFO
     CROP_HEIGHT = 120
     CROP_WIDTH = 160
     LABELS = 21
@@ -77,6 +77,8 @@ try:
 
                 image_array_list.append(image_array)
                 annotation_array_list.append(annotation_array)
+                image_array_list.append(image_array[:, ::-1])
+                annotation_array_list.append(annotation_array[:, ::-1])
 
                 status = int((i + 1) / data_num * 100)
                 if status % 2 == 0:
@@ -86,7 +88,7 @@ try:
                 else:
                     show_flag = 0
 
-        annotation_data = annotation_array
+        annotation_data = annotation_array[:, ::-1]
         annotation_image = Image.fromarray(annotation_data)
         annotation_image.putpalette(palette)
         annotation_image.show()
@@ -159,6 +161,8 @@ try:
 
                 image_array_list.append(image_array)
                 annotation_array_list.append(annotation_array)
+                image_array_list.append(image_array[:, ::-1])
+                annotation_array_list.append(annotation_array[:, ::-1])
 
                 status = int((i + 1) / data_num * 100)
                 if status % 2 == 0:
@@ -241,6 +245,8 @@ try:
 
                 image_array_list.append(image_array)
                 annotation_array_list.append(annotation_array)
+                image_array_list.append(image_array[:, ::-1])
+                annotation_array_list.append(annotation_array[:, ::-1])
 
                 status = int((i + 1) / data_num * 100)
                 if status % 2 == 0:
