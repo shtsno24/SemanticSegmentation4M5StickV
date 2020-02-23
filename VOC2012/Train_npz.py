@@ -1,0 +1,76 @@
+import numpy as np
+import tensorflow as tf
+
+import Model
+
+try:
+    physical_devices = tf.config.experimental.list_physical_devices('GPU')
+    if len(physical_devices) > 0:
+        for k in range(len(physical_devices)):
+            tf.config.experimental.set_memory_growth(physical_devices[k], True)
+            print('memory growth:', tf.config.experimental.get_memory_growth(physical_devices[k]))
+    else:
+        print("Not enough GPU hardware devices available")
+except:
+    import traceback
+    traceback.print_exc()
+
+try:
+    TRAIN_RECORDS = "./data/VOC2012_resize_train.npz"
+    TEST_RECORDS = "./data/VOC2012_resize_val.npz"
+    # TRAIN_RECORDS = "./VOC2012_resize_train.npz"
+    # TEST_RECORDS = "./VOC2012_resize_val.npz"
+    BATCH_SIZE = 15
+    SHUFFLE_SIZE = 100
+    TRAIN_DATASET_SIZE = 1464
+    TEST_DATASET_SIZE = 1450
+    EPOCHS = 10
+    LABELS = 21
+    COLOR_DEPTH = 3
+    CROP_HEIGHT = 120
+    CROP_WIDTH = 160
+
+    # Load data from .npz
+    print("Load dataset...\n\n")
+    with np.load(TRAIN_RECORDS) as f:
+        image_data = f["image"]
+        annotation_data = f["annotation"]
+        label_balance_array_resize = f["label_pix_resize"]
+    image_data = image_data.astype(np.float32)
+    image_data /= 255.0
+    train_dataset = tf.data.Dataset.from_tensor_slices((image_data, annotation_data))
+    train_dataset = train_dataset.shuffle(SHUFFLE_SIZE).batch(BATCH_SIZE)
+    CLASS_WEIGHT = {i: (1 / label_balance_array_resize[i]) * (np.sum(label_balance_array_resize) / LABELS) for i in range(LABELS)}
+    print(train_dataset)
+
+    with np.load(TEST_RECORDS) as f:
+        image_data = f["image"]
+        annotation_data = f["annotation"]
+    image_data = image_data.astype(np.float32)
+    image_data /= 255.0
+    test_dataset = tf.data.Dataset.from_tensor_slices((image_data, annotation_data))
+    test_dataset = test_dataset.batch(BATCH_SIZE)
+    print(test_dataset, "\n\nDone")
+
+    # Load model
+    print("Load Model...\n\n")
+    model = Model.TestNet()
+    model.summary()
+    print("\nDone")
+
+    # Train model
+    print("\n\nTrain Model...")
+    model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), optimizer='adam', metrics=["accuracy"])
+    model.fit(train_dataset, validation_data=test_dataset, epochs=EPOCHS,
+              steps_per_epoch=int(TRAIN_DATASET_SIZE / BATCH_SIZE / EPOCHS),
+              validation_steps=int(TEST_DATASET_SIZE / BATCH_SIZE / EPOCHS),
+              class_weight=CLASS_WEIGHT)
+    model.save('TestNet_VOC2012_npz.h5')
+    print("  Done\n\n")
+
+except:
+    import traceback
+    traceback.print_exc()
+
+finally:
+    input(">")

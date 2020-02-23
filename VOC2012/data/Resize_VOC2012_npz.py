@@ -27,7 +27,9 @@ try:
     image_array_list = []
     annotation_array_list = []
     label_balance_array = np.zeros(LABELS)
+    label_pixel_count_array = np.zeros(LABELS)
     label_balance_array_resize = np.zeros(LABELS)
+    label_pixel_count_array_resize = np.zeros(LABELS)
 
     # Generate Train Data Records
     try:
@@ -48,6 +50,8 @@ try:
                     annotation_data[annotation_data == 255] = 0
                     hist, bin = np.histogram(annotation_data, bins=np.arange(LABELS + 1))
                     label_balance_array += hist
+                    pixel_cnt = annotation_data.shape[0] * annotation_data.shape[1] * annotation_data.shape[2]
+                    label_pixel_count_array[hist > 0] += pixel_cnt
                     if i == 0:
                         palette = np.array(annotation_object.getpalette(), dtype=np.uint8).reshape(-1, 3)
 
@@ -68,6 +72,8 @@ try:
                 image_array = image_data.numpy()
                 hist, bin = np.histogram(annotation_array, bins=np.arange(LABELS + 1))
                 label_balance_array_resize += hist
+                pixel_cnt = annotation_array.shape[0] * annotation_array.shape[1]
+                label_pixel_count_array_resize[hist > 0] += pixel_cnt
 
                 image_array_list.append(image_array)
                 annotation_array_list.append(annotation_array)
@@ -91,10 +97,16 @@ try:
                  image=image_data,
                  annotation=annotation_data,
                  label_pix_resize=label_balance_array_resize,
-                 label_pix=label_balance_array)
+                 label_pix=label_balance_array,
+                 label_pix_cnt=label_pixel_count_array,
+                 label_pix_cnt_resize=label_pixel_count_array_resize)
         print("Labels               :", bin)
         print("Pixels in each label :", label_balance_array)
-        print("Pixels in each label(with resized images) :", label_balance_array)
+        print("Pixels in each label(with resized images) :", label_balance_array_resize)
+        label_balance_array = np.zeros(LABELS)
+        label_balance_array_resize = np.zeros(LABELS)
+        label_pixel_count_array = np.zeros(LABELS)
+        label_pixel_count_array_resize = np.zeros(LABELS)
         print("\n\nDone")
 
     except:
@@ -120,6 +132,8 @@ try:
                     annotation_data[annotation_data == 255] = 0
                     hist, bin = np.histogram(annotation_data, bins=np.arange(LABELS + 1))
                     label_balance_array += hist
+                    pixel_cnt = annotation_data.shape[0] * annotation_data.shape[1] * annotation_data.shape[2]
+                    label_pixel_count_array[hist > 0] += pixel_cnt
                     if i == 0:
                         palette = np.array(annotation_object.getpalette(), dtype=np.uint8).reshape(-1, 3)
 
@@ -140,6 +154,8 @@ try:
                 image_array = image_data.numpy()
                 hist, bin = np.histogram(annotation_array, bins=np.arange(LABELS + 1))
                 label_balance_array_resize += hist
+                pixel_cnt += annotation_array.shape[0] * annotation_array.shape[1]
+                label_pixel_count_array_resize[hist > 0] += pixel_cnt
 
                 image_array_list.append(image_array)
                 annotation_array_list.append(annotation_array)
@@ -163,10 +179,16 @@ try:
                  image=image_data,
                  annotation=annotation_data,
                  label_pix_resize=label_balance_array_resize,
-                 label_pix=label_balance_array)
+                 label_pix=label_balance_array,
+                 label_pix_cnt=label_pixel_count_array,
+                 label_pix_cnt_resize=label_pixel_count_array_resize)
         print("Labels               :", bin)
         print("Pixels in each label :", label_balance_array)
         print("Pixels in each label(with resized images) :", label_balance_array)
+        label_balance_array = np.zeros(LABELS)
+        label_balance_array_resize = np.zeros(LABELS)
+        label_pixel_count_array = np.zeros(LABELS)
+        label_pixel_count_array_resize = np.zeros(LABELS)
         print("\n\nDone")
 
     except:
@@ -192,6 +214,8 @@ try:
                     annotation_data[annotation_data == 255] = 0
                     hist, bin = np.histogram(annotation_data, bins=np.arange(LABELS + 1))
                     label_balance_array += hist
+                    pixel_cnt = annotation_data.shape[0] * annotation_data.shape[1] * annotation_data.shape[2]
+                    label_pixel_count_array[hist > 0] += pixel_cnt
                     if i == 0:
                         palette = np.array(annotation_object.getpalette(), dtype=np.uint8).reshape(-1, 3)
 
@@ -212,6 +236,8 @@ try:
                 image_array = image_data.numpy()
                 hist, bin = np.histogram(annotation_array, bins=np.arange(LABELS + 1))
                 label_balance_array_resize += hist
+                pixel_cnt += annotation_array.shape[0] * annotation_array.shape[1]
+                label_pixel_count_array_resize[hist > 0] += pixel_cnt
 
                 image_array_list.append(image_array)
                 annotation_array_list.append(annotation_array)
@@ -235,10 +261,16 @@ try:
                  image=image_data,
                  annotation=annotation_data,
                  label_pix_resize=label_balance_array_resize,
-                 label_pix=label_balance_array)
+                 label_pix=label_balance_array,
+                 label_pix_cnt=label_pixel_count_array,
+                 label_pix_cnt_resize=label_pixel_count_array_resize)
         print("Labels               :", bin)
         print("Pixels in each label :", label_balance_array)
         print("Pixels in each label(with resized images) :", label_balance_array)
+        label_balance_array = np.zeros(LABELS)
+        label_balance_array_resize = np.zeros(LABELS)
+        label_pixel_count_array = np.zeros(LABELS)
+        label_pixel_count_array_resize = np.zeros(LABELS)
         print("\n\nDone")
 
     except:

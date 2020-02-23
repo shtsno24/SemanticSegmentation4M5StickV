@@ -5,9 +5,9 @@ from PIL import Image
 
 try:
 
-    TEST_IMAGE = "./data/JPEGImages/2007_000033.jpg"
-    TEST_ANNOTATION = "./data/SegmentationClass/2007_000033.png"
-    MODEL_FILE = "TestNet_VOC2012.h5"
+    TEST_IMAGE = "./data/JPEGImages/2007_000032.jpg"
+    TEST_ANNOTATION = "./data/SegmentationClass/2007_000032.png"
+    MODEL_FILE = "TestNet_VOC2012_npz.h5"
     LABELS = 21
     COLOR_DEPTH = 3
     CROP_HEIGHT = 120
