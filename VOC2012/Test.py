@@ -5,8 +5,8 @@ from PIL import Image
 
 try:
 
-    TEST_IMAGE = "./data/JPEGImages/2007_000032.jpg"
-    TEST_ANNOTATION = "./data/SegmentationClass/2007_000032.png"
+    TEST_IMAGE = "./data/JPEGImages/2007_000346.jpg"
+    TEST_ANNOTATION = "./data/SegmentationClass/2007_000346.png"
     MODEL_FILE = "TestNet_VOC2012_npz.h5"
     LABELS = 21
     COLOR_DEPTH = 3
