@@ -93,7 +93,6 @@ try:
         traceback.print_exc()
         sys.exit(1)
 
-
     # Generate Train Validate Data Records
     try:
         print("\n\n\nGenerate Train Validate Data Records...\n")
