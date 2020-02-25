@@ -2,6 +2,18 @@ import numpy as np
 import tensorflow as tf
 from PIL import Image
 
+import Model
+
+
+def weighted_SparseCategoricalCrossentropy(classes):
+    def loss_function(y_true, y_pred):
+        y_true = tf.cast(y_true, tf.uint8)
+        y_true = tf.one_hot(y_true, depth=classes)
+        y_true = tf.cast(y_true, tf.float32)
+        loss = y_true * tf.math.log(y_pred)
+        return -1 * tf.math.reduce_sum(loss)
+    return loss_function
+
 
 try:
 
@@ -41,7 +53,7 @@ try:
 
     # Load model
     print("\n\nLoad Model...\n")
-    model = tf.keras.models.load_model(MODEL_FILE)
+    model = tf.keras.models.load_model(MODEL_FILE,  custom_objects={'loss_function': weighted_SparseCategoricalCrossentropy(LABELS)})
     model.summary()
     print("\nDone")
 

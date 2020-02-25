@@ -21,6 +21,8 @@ def TestNet(input_shape=(120, 160, 3), classes=21):
     x = Concatenate(axis=3)([x_3, x_5, x_7])
     x = Conv2D(64, (1, 1), activation="relu")(x)
     x = DepthwiseConv2D((3, 3), padding="same")(x)
+    x = Conv2D(64, (1, 1), activation="relu")(x)
+    x = DepthwiseConv2D((3, 3), padding="same")(x)
     x = Conv2D(64, (1, 1))(x)
     x = BatchNormalization()(x)
     x0 = Activation("relu")(x)
@@ -28,6 +30,8 @@ def TestNet(input_shape=(120, 160, 3), classes=21):
 
     # 60 x 80 x 64
 
+    x = DepthwiseConv2D((3, 3), padding="same")(x)
+    x = Conv2D(128, (1, 1), activation="relu")(x)
     x = DepthwiseConv2D((3, 3), padding="same")(x)
     x = Conv2D(128, (1, 1), activation="relu")(x)
     x = DepthwiseConv2D((3, 3), padding="same")(x)
@@ -41,6 +45,8 @@ def TestNet(input_shape=(120, 160, 3), classes=21):
     x = DepthwiseConv2D((3, 3), padding="same")(x)
     x = Conv2D(256, (1, 1), activation="relu")(x)
     x = DepthwiseConv2D((3, 3), padding="same")(x)
+    x = Conv2D(256, (1, 1), activation="relu")(x)
+    x = DepthwiseConv2D((3, 3), padding="same")(x)
     x = Conv2D(256, (1, 1))(x)
     x = BatchNormalization()(x)
     x2 = Activation("relu")(x)
@@ -51,12 +57,15 @@ def TestNet(input_shape=(120, 160, 3), classes=21):
     x = DepthwiseConv2D((3, 3), padding="same")(x)
     x = Conv2D(256, (1, 1), activation="relu")(x)
     x = DepthwiseConv2D((3, 3), padding="same")(x)
+    x = Conv2D(256, (1, 1), activation="relu")(x)
+    x = DepthwiseConv2D((3, 3), padding="same")(x)
     x = Conv2D(256, (1, 1))(x)
     x = BatchNormalization()(x)
     x = Activation("relu")(x)
     x = DepthwiseConv2D((3, 3), padding="same")(x)
     x = Conv2D(256, (1, 1), activation="relu")(x)
-
+    x = DepthwiseConv2D((3, 3), padding="same")(x)
+    x = Conv2D(256, (1, 1), activation="relu")(x)
 
     # 15 x 20 x 256
 
@@ -103,97 +112,11 @@ def TestNet(input_shape=(120, 160, 3), classes=21):
     model = Model(inputs, outputs)
     return model
 
-def TestNet3(input_shape=(120, 160, 3), classes=21):
-    # @ https://github.com/alexgkendall/SegNet-Tutorial/blob/master/Example_Models/bayesian_segnet_camvid.prototxt
-    img_input = Input(shape=input_shape)
-    x = img_input
-    # Encoder
-    x = Conv2D(64, (3, 3), padding="same")(x)
-    x = BatchNormalization()(x)
-    x = Activation("relu")(x)
-    x = MaxPooling2D(pool_size=(2, 2))(x)
-
-    x = Conv2D(128, (3, 3), padding="same")(x)
-    x = BatchNormalization()(x)
-    x = Activation("relu")(x)
-    x = MaxPooling2D(pool_size=(2, 2))(x)
-
-    x = Conv2D(256, (3, 3), padding="same")(x)
-    x = BatchNormalization()(x)
-    x = Activation("relu")(x)
-    x = MaxPooling2D(pool_size=(2, 2))(x)
-
-    x = Conv2D(512, (3, 3), padding="same")(x)
-    x = BatchNormalization()(x)
-    x = Activation("relu")(x)
-
-    # Decoder
-    x = Conv2D(512, (3, 3), padding="same")(x)
-    x = BatchNormalization()(x)
-    x = Activation("relu")(x)
-
-    x = UpSampling2D(size=(2, 2))(x)
-    x = Conv2D(256, (3, 3), padding="same")(x)
-    x = BatchNormalization()(x)
-    x = Activation("relu")(x)
-
-    x = UpSampling2D(size=(2, 2))(x)
-    x = Conv2D(128, (3, 3), padding="same")(x)
-    x = BatchNormalization()(x)
-    x = Activation("relu")(x)
-
-    x = UpSampling2D(size=(2, 2))(x)
-    x = Conv2D(64, (3, 3), padding="same")(x)
-    x = BatchNormalization()(x)
-    x = Activation("relu")(x)
-
-    x = Conv2D(classes, (1, 1), padding="valid")(x)
-    x = Activation("softmax")(x)
-    model = Model(img_input, x)
-    return model
-
-def TestNet4(input_shape=(120, 160, 3), classes=21):
-    inputs = Input(shape=input_shape)
-
-    x = Conv2D(16, (3, 3), padding="same")(inputs)
-    x = LeakyReLU()(x)
-    x = MaxPooling2D(pool_size=(2, 2))(x)
-
-    x = Conv2D(32, (3, 3), padding="same")(x)
-    x = LeakyReLU()(x)
-    x = MaxPooling2D(pool_size=(2, 2))(x)
-
-    x = Conv2D(64, (3, 3), padding="same")(x)
-    x = LeakyReLU()(x)
-    x = MaxPooling2D(pool_size=(2, 2))(x)
-
-    x = Conv2D(128, (3, 3), padding="same")(x)
-    x = LeakyReLU()(x)
-    x = MaxPooling2D(pool_size=(2, 2))(x)
-
-    # x = Conv2D(128, (3, 3), padding="same")(x)
-    # x = LeakyReLU()(x)
-    # x = MaxPooling2D(pool_size=(2, 2))(x)
-
-    x = Conv2D(256, (3, 3), padding="same")(x)
-    x = LeakyReLU()(x)
-    x = MaxPooling2D(pool_size=(2, 2))(x)
-
-    x = Conv2D(512, (3, 3), padding="same")(x)
-    x = LeakyReLU()(x)
-    x = MaxPooling2D(pool_size=(2, 2))(x)
-
-    x = Conv2D(1024, (3, 3), padding="same")(x)
-    x = LeakyReLU()(x)
-    x = MaxPooling2D(pool_size=(2, 2))(x)
-
-    x = Conv2D(1024, (3, 3), padding="same")(x)
-    x = LeakyReLU()(x)
-    x = MaxPooling2D(pool_size=(2, 2))(x)
-
-    x = Conv2D(125, (1, 1), padding="same")(x)
-    x = LeakyReLU()(x)
-
-    outputs = Activation("softmax")(x)
-    model = Model(inputs, outputs)
-    return model
+def weighted_SparseCategoricalCrossentropy(sample_weights, classes):
+    def loss_function(y_true, y_pred):
+        y_true = tf.cast(y_true, tf.uint8)
+        y_true = tf.one_hot(y_true, depth=classes)
+        y_true = tf.cast(y_true, tf.float32)
+        loss = y_true * tf.math.log(y_pred) * sample_weights
+        return -1 * tf.math.reduce_mean(loss)
+    return loss_function
