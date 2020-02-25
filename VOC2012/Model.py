@@ -87,14 +87,6 @@ def TestNet(input_shape=(120, 160, 3), classes=21):
 
     # 60 x 80 x 64
 
-<<<<<<< HEAD
-    x = UpSampling2D(size=(2, 2))(x)
-    x = Concatenate()([x, x0])
-    x = DepthwiseConv2D((3, 3), padding="same")(x)
-    x = Conv2D(classes, (1, 1))(x)
-
-    # 120 x 160 x classes
-=======
     # x = UpSampling2D(size=(2, 2))(x)
     # x = Concatenate()([x, x0])
     # x = DepthwiseConv2D((3, 3), padding="same")(x)
@@ -106,7 +98,6 @@ def TestNet(input_shape=(120, 160, 3), classes=21):
     # 120 x 160 x classes
 
     x = Conv2D(classes, (1, 1))(x)
->>>>>>> 0f42b23a8a0fa6e143b7dcd695d91ac7ab200b17
     outputs = Activation("softmax")(x)
 
     model = Model(inputs, outputs)
