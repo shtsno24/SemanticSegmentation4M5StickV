@@ -17,7 +17,7 @@ def TestNet(input_shape=(120, 160, 3), classes=21):
     x_3 = DepthwiseConv2D((3, 3), padding="same")(inputs)
     x_5 = DepthwiseConv2D((5, 5), padding="same")(inputs)
     x_7 = DepthwiseConv2D((7, 7), padding="same")(inputs)
-    x = Concatenate()([x_3, x_5, x_7])
+    x = Concatenate(axis=3)([x_3, x_5, x_7])
     x = Conv2D(64, (1, 1), activation="relu")(x)
     x = DepthwiseConv2D((3, 3), padding="same")(x)
     x = Conv2D(64, (1, 1))(x)
@@ -66,6 +66,7 @@ def TestNet(input_shape=(120, 160, 3), classes=21):
     # x = BatchNormalization()(x)
     # x = Activation("relu")(x)
     x = Conv2DTranspose(128, (3, 3), strides=(2, 2), padding="same")(x)
+    x = Concatenate(axis=3)([x, x2])
     x = BatchNormalization()(x)
     x = Activation("relu")(x)
 
@@ -78,8 +79,8 @@ def TestNet(input_shape=(120, 160, 3), classes=21):
     # x = BatchNormalization()(x)
     # x = Activation("relu")(x)
     # x = Concatenate()([x, x1])
-    x = Concatenate()([x, x2])
     x = Conv2DTranspose(64, (3, 3), strides=(2, 2), padding="same")(x)
+    x = Concatenate(axis=3)([x, x1])
     x = BatchNormalization()(x)
     x = Activation("relu")(x)
 
@@ -89,12 +90,13 @@ def TestNet(input_shape=(120, 160, 3), classes=21):
     # x = Concatenate()([x, x0])
     # x = DepthwiseConv2D((3, 3), padding="same")(x)
     # x = Conv2D(classes, (1, 1))(x)
-    x = Concatenate()([x, x1])
     x = Conv2DTranspose(classes, (3, 3), strides=(2, 2), padding="same")(x)
+    x = Concatenate(axis=3)([x, x0])
     x = BatchNormalization()(x)
 
     # 120 x 160 x classes
 
+    x = Conv2D(classes, (1, 1))(x)
     outputs = Activation("softmax")(x)
 
     model = Model(inputs, outputs)
