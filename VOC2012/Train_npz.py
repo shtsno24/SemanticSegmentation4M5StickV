@@ -1,8 +1,10 @@
 import numpy as np
 import tensorflow as tf
-
+from tensorflow.python.client import device_lib
+device_list = device_lib.list_local_devices()
 
 import Model
+
 
 try:
     physical_devices = tf.config.experimental.list_physical_devices('GPU')
@@ -31,43 +33,44 @@ try:
     CROP_HEIGHT = 128
     CROP_WIDTH = 160
 
-    # Load data from .npz
-    print("Load dataset...\n\n")
-    with np.load(TRAIN_RECORDS) as f:
-        image_data = f["image"]
-        annotation_data = f["annotation"]
-        label_balance_array_resize = f["label_pix_resize"]
-        label_pixel_count_array_resize = f["label_pix_cnt_resize"]
-    annotation_data = annotation_data.astype(np.float32)
-    image_data = image_data.astype(np.float32)
-    image_data /= 255.0
+    with tf.device('/cpu:0'):
+        # Load data from .npz
+        print("Load dataset...\n\n")
+        with np.load(TRAIN_RECORDS) as f:
+            image_data = f["image"]
+            annotation_data = f["annotation"]
+            label_balance_array_resize = f["label_pix_resize"]
+            label_pixel_count_array_resize = f["label_pix_cnt_resize"]
+        annotation_data = annotation_data.astype(np.float32)
+        image_data = image_data.astype(np.float32)
+        image_data /= 255.0
 
-    image_freq = label_balance_array_resize / label_pixel_count_array_resize
-    CLASS_WEIGHT = {i: (np.median(image_freq) / image_freq)[i] for i in range(LABELS)}
-    SAMPLE_WEIGHT = np.array([[[CLASS_WEIGHT[w] for w in range(LABELS)] for rows in range(CROP_WIDTH)] for columns in range(CROP_HEIGHT)])
-    SAMPLE_WEIGHT = SAMPLE_WEIGHT.reshape((1,) + SAMPLE_WEIGHT.shape)
+        image_freq = label_balance_array_resize / label_pixel_count_array_resize
+        CLASS_WEIGHT = {i: (np.median(image_freq) / image_freq)[i] for i in range(LABELS)}
+        SAMPLE_WEIGHT = np.array([[[CLASS_WEIGHT[w] for w in range(LABELS)] for rows in range(CROP_WIDTH)] for columns in range(CROP_HEIGHT)])
+        SAMPLE_WEIGHT = SAMPLE_WEIGHT.reshape((1,) + SAMPLE_WEIGHT.shape)
 
-    train_dataset = tf.data.Dataset.from_tensor_slices((image_data, annotation_data))
-    train_dataset = train_dataset.shuffle(SHUFFLE_SIZE).batch(BATCH_SIZE).repeat(-1)
+        train_dataset = tf.data.Dataset.from_tensor_slices((image_data, annotation_data))
+        train_dataset = train_dataset.shuffle(SHUFFLE_SIZE).batch(BATCH_SIZE).repeat(-1)
 
-    print(CLASS_WEIGHT)
-    print(train_dataset)
+        print(CLASS_WEIGHT)
+        print(train_dataset)
 
-    with np.load(TEST_RECORDS) as f:
-        image_data = f["image"]
-        annotation_data = f["annotation"]
-    annotation_data = annotation_data.astype(np.float32)
-    image_data = image_data.astype(np.float32)
-    image_data /= 255.0
-    test_dataset = tf.data.Dataset.from_tensor_slices((image_data, annotation_data))
-    test_dataset = test_dataset.batch(BATCH_SIZE).repeat(-1)
-    print(test_dataset, "\n\nDone")
+        with np.load(TEST_RECORDS) as f:
+            image_data = f["image"]
+            annotation_data = f["annotation"]
+        annotation_data = annotation_data.astype(np.float32)
+        image_data = image_data.astype(np.float32)
+        image_data /= 255.0
+        test_dataset = tf.data.Dataset.from_tensor_slices((image_data, annotation_data))
+        test_dataset = test_dataset.batch(BATCH_SIZE).repeat(-1)
+        print(test_dataset, "\n\nDone")
 
-    # Load model
-    print("Load Model...\n\n")
-    model = Model.TestNet()
-    model.summary()
-    print("\nDone")
+        # Load model
+        print("Load Model...\n\n")
+        model = Model.TestNet()
+        model.summary()
+        print("\nDone")
 
     # Train model
     print("\n\nTrain Model...")
