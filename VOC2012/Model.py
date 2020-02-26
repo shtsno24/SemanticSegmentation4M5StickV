@@ -158,7 +158,7 @@ def TestNet(input_shape=(128, 160, 4), classes=21):
 
     inputs = Input(shape=input_shape)
     x = initial_block(inputs, 4, 16)
-
+    x_skip_0 = x
     # 64 x 80 x 16
 
     x = bottleneck_downsample(x, 64)
@@ -167,7 +167,7 @@ def TestNet(input_shape=(128, 160, 4), classes=21):
 
     for _ in range(4):
         x = bottleneck(x, 64)
-
+    x_skip_1 = x
     x = bottleneck_downsample(x, 128)
 
     # 16 x 20 x 128
@@ -183,12 +183,14 @@ def TestNet(input_shape=(128, 160, 4), classes=21):
         x = bottleneck_dilated(x, 16, 128)
 
     x = bottleneck_upsampling(x, 64)
+    x = Concatenate(axis=3)([x, x_skip_1])
     x = bottleneck(x, 64)
     x = bottleneck(x, 64)
 
     # 32 x 40 x 64
 
     x = bottleneck_upsampling(x, 16)
+    x = Concatenate(axis=3)([x, x_skip_0])
     x = bottleneck(x, 16)
 
     # 64 x 80 x 16

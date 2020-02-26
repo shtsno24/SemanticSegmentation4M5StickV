@@ -24,7 +24,7 @@ try:
     SHUFFLE_SIZE = 12
     TRAIN_DATASET_SIZE = 1464 * 2
     TEST_DATASET_SIZE = 1450 * 2
-    EPOCHS = 50
+    EPOCHS = 100
     LABELS = 21
     COLOR_DEPTH = 3
     CROP_HEIGHT = 128
@@ -72,7 +72,7 @@ try:
     print("\n\nTrain Model...")
     model.compile(loss=Model.weighted_SparseCategoricalCrossentropy(SAMPLE_WEIGHT), optimizer='adam', metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
     model.fit(train_dataset, validation_data=test_dataset, epochs=EPOCHS,
-              steps_per_epoch=int(TRAIN_DATASET_SIZE / BATCH_SIZE / EPOCHS),
+              steps_per_epoch=int(TRAIN_DATASET_SIZE / BATCH_SIZE / EPOCHS * 2),
               validation_steps=int(TEST_DATASET_SIZE / BATCH_SIZE / EPOCHS))
     model.save('TestNet_VOC2012_npz.h5')
     print("  Done\n\n")
