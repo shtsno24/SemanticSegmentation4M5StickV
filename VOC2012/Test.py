@@ -1,6 +1,6 @@
 import numpy as np
 import tensorflow as tf
-from PIL import Image
+from PIL import Image, ImageFilter, ImageChops
 
 import Model
 
@@ -17,12 +17,12 @@ def weighted_SparseCategoricalCrossentropy(classes):
 
 try:
 
-    TEST_IMAGE = "./data/JPEGImages/2007_000346.jpg"
-    TEST_ANNOTATION = "./data/SegmentationClass/2007_000346.png"
+    TEST_IMAGE = "./data/JPEGImages/2007_004830.jpg"
+    TEST_ANNOTATION = "./data/SegmentationClass/2007_004830.png"
     MODEL_FILE = "TestNet_VOC2012_npz.h5"
     LABELS = 21
     COLOR_DEPTH = 3
-    CROP_HEIGHT = 120
+    CROP_HEIGHT = 128 # sensor.LCD[128, 160]
     CROP_WIDTH = 160
 
     # Load data
@@ -35,11 +35,18 @@ try:
         palette[21] = 255
     with Image.open(TEST_IMAGE) as image_object:
         image_object = image_object.convert("RGB")
+
+        image_edge = image_object.convert("L")
+        image_dilation = image_edge.filter(ImageFilter.MaxFilter(3))
+        image_edge = ImageChops.difference(image_dilation, image_edge)
+        image_edge_data = np.array(image_edge, dtype=np.uint8)
+
         image_data = np.array(image_object, dtype=np.uint8)
+        image_data = np.concatenate((image_data, image_edge_data.reshape(image_edge_data.shape + (1,))), axis=2)
         image_data = image_data.reshape((1,) + image_data.shape)
 
         # Resizeing data
-    X, Y = image_data.shape[0], image_data.shape[1]
+    X, Y = image_data.shape[1], image_data.shape[2]
     if X < Y:
         long_side = Y
     else:
@@ -74,8 +81,11 @@ try:
     annotation_object = Image.fromarray(annotation_data.numpy().reshape((CROP_HEIGHT, CROP_WIDTH)).astype(np.uint8))
     annotation_object.putpalette(palette)
     annotation_object.save("Test_Annotation.png")
-    image_object = Image.fromarray(image_data.numpy().reshape((CROP_HEIGHT, CROP_WIDTH, COLOR_DEPTH)).astype(np.uint8))
+    image_buffer = image_data.numpy()
+    image_object = Image.fromarray(image_buffer[:, :, :, 0:3].reshape((CROP_HEIGHT, CROP_WIDTH, COLOR_DEPTH)).astype(np.uint8))
     image_object.save("Test_Image.png")
+    edge_object = Image.fromarray(image_buffer[:, :, :, 3:4].reshape((CROP_HEIGHT, CROP_WIDTH)).astype(np.uint8))
+    edge_object.save("Edge_Image.png")
     print("\nDone")
 except:
     import traceback

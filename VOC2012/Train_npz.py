@@ -16,18 +16,18 @@ except:
     traceback.print_exc()
 
 try:
-    # TRAIN_RECORDS = "./data/VOC2012_resize_train.npz"
-    # TEST_RECORDS = "./data/VOC2012_resize_val.npz"
-    TRAIN_RECORDS = "./VOC2012_resize_train.npz"
-    TEST_RECORDS = "./VOC2012_resize_val.npz"
+    TRAIN_RECORDS = "./data/VOC2012_resize_train.npz"
+    TEST_RECORDS = "./data/VOC2012_resize_val.npz"
+    # TRAIN_RECORDS = "./VOC2012_resize_train.npz"
+    # TEST_RECORDS = "./VOC2012_resize_val.npz"
     BATCH_SIZE = 6
     SHUFFLE_SIZE = 12
     TRAIN_DATASET_SIZE = 1464 * 2
     TEST_DATASET_SIZE = 1450 * 2
-    EPOCHS = 30
+    EPOCHS = 50
     LABELS = 21
     COLOR_DEPTH = 3
-    CROP_HEIGHT = 120
+    CROP_HEIGHT = 128
     CROP_WIDTH = 160
 
     # Load data from .npz
@@ -70,7 +70,7 @@ try:
 
     # Train model
     print("\n\nTrain Model...")
-    model.compile(loss=Model.weighted_SparseCategoricalCrossentropy(SAMPLE_WEIGHT, LABELS), optimizer='adam', metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
+    model.compile(loss=Model.weighted_SparseCategoricalCrossentropy(SAMPLE_WEIGHT), optimizer='adam', metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
     model.fit(train_dataset, validation_data=test_dataset, epochs=EPOCHS,
               steps_per_epoch=int(TRAIN_DATASET_SIZE / BATCH_SIZE / EPOCHS),
               validation_steps=int(TEST_DATASET_SIZE / BATCH_SIZE / EPOCHS))
