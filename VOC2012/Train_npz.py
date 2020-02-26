@@ -72,7 +72,7 @@ try:
     print("\n\nTrain Model...")
     model.compile(loss=Model.weighted_SparseCategoricalCrossentropy(SAMPLE_WEIGHT), optimizer='adam', metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
     model.fit(train_dataset, validation_data=test_dataset, epochs=EPOCHS,
-              steps_per_epoch=int(TRAIN_DATASET_SIZE / BATCH_SIZE / EPOCHS * 2),
+              steps_per_epoch=int(TRAIN_DATASET_SIZE / BATCH_SIZE),
               validation_steps=int(TEST_DATASET_SIZE / BATCH_SIZE / EPOCHS))
     model.save('TestNet_VOC2012_npz.h5')
     print("  Done\n\n")

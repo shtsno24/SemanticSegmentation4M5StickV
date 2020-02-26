@@ -24,21 +24,27 @@ def weighted_SparseCategoricalCrossentropy(sample_weights, classes=21):
     return loss_function
 
 
-def initial_block(x, input_depth, channel, kernel_size=(3, 3), stride=(2, 2), Momentum=0.1):
+def initial_block(x, input_depth, channel, stride=(2, 2), Momentum=0.1):
     # x_conv = Conv2D(channel - input_depth, kernel_size, padding="same", strides=stride)(x)
     internal_channel = int((channel - input_depth) / 2)
 
-    x_conv_3 = DepthwiseConv2D(kernel_size, strides=(2, 2), padding="same")(x)
+    x_conv_3 = DepthwiseConv2D((3, 3), padding="same")(x)
     x_conv_3 = Activation("relu")(x_conv_3)
     x_conv_3 = Conv2D(internal_channel, (1, 1))(x_conv_3)
     x_conv_3 = Activation("relu")(x_conv_3)
 
-    x_conv_5 = DepthwiseConv2D(kernel_size, padding="same")(x_conv_3)
+    x_conv_5 = DepthwiseConv2D((5, 5), padding="same")(x)
     x_conv_5 = Activation("relu")(x_conv_5)
     x_conv_5 = Conv2D(internal_channel, (1, 1))(x_conv_5)
     x_conv_5 = Activation("relu")(x_conv_5)
 
-    x_conv = Concatenate(axis=3)([x_conv_3, x_conv_5])
+    x_conv_7 = DepthwiseConv2D((7, 7), padding="same")(x)
+    x_conv_7 = Activation("relu")(x_conv_7)
+    x_conv_7 = Conv2D(internal_channel, (1, 1))(x_conv_7)
+    x_conv_7 = Activation("relu")(x_conv_7)
+
+    x_conv = Concatenate(axis=3)([x_conv_3, x_conv_5, x_conv_7])
+    x_conv = MaxPooling2D(pool_size=(2, 2))(x_conv)
 
     x_pool = MaxPooling2D(pool_size=(2, 2))(x)
     y = Concatenate(axis=3)([x_conv, x_pool])

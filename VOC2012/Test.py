@@ -17,8 +17,10 @@ def weighted_SparseCategoricalCrossentropy(classes):
 
 try:
 
-    TEST_IMAGE = "./data/JPEGImages/2007_004830.jpg"
-    TEST_ANNOTATION = "./data/SegmentationClass/2007_004830.png"
+    # TEST_IMAGE = "./data/JPEGImages/2007_004830.jpg"
+    # TEST_ANNOTATION = "./data/SegmentationClass/2007_004830.png"
+    TEST_IMAGE = "./data/JPEGImages/2007_000032.jpg"
+    TEST_ANNOTATION = "./data/SegmentationClass/2007_000032.png"
     MODEL_FILE = "TestNet_VOC2012_npz.h5"
     LABELS = 21
     COLOR_DEPTH = 3
@@ -38,7 +40,8 @@ try:
 
         image_edge = image_object.convert("L")
         image_dilation = image_edge.filter(ImageFilter.MaxFilter(3))
-        image_edge = ImageChops.difference(image_dilation, image_edge)
+        image_erosion = image_edge.filter(ImageFilter.MinFilter(3))
+        image_edge = ImageChops.difference(image_dilation, image_erosion)
         image_edge_data = np.array(image_edge, dtype=np.uint8)
 
         image_data = np.array(image_object, dtype=np.uint8)
