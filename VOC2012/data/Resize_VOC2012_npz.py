@@ -4,12 +4,12 @@ import sys
 import traceback
 import numpy as np
 import tensorflow as tf
-from PIL import Image
+from PIL import Image, ImageFilter, ImageChops
 
 
 try:
     tf.add(1, 1)  # To show INFO
-    CROP_HEIGHT = 120
+    CROP_HEIGHT = 128
     CROP_WIDTH = 160
     LABELS = 21
     COLOR_DEPTH = 3
@@ -43,7 +43,16 @@ try:
                 image_file_name = image_file_directories["image"] + name[0] + ".jpg"
                 annotation_file_name = image_file_directories["annotation"] + name[0] + ".png"
                 with Image.open(image_file_name) as image_object:
+                    image_object = image_object.convert("RGB")
                     image_data = np.array(image_object, dtype=np.uint8)
+                    # Detect Edges in image
+                    image_edge = image_object.convert("L")
+                    image_dilation = image_edge.filter(ImageFilter.MaxFilter(3))
+                    image_erosion = image_edge.filter(ImageFilter.MinFilter(3))
+                    image_edge = ImageChops.difference(image_dilation, image_erosion)
+                    image_edge_array = np.array(image_edge, dtype=np.uint8)
+                    image_data = np.concatenate((image_data, image_edge_array.reshape(image_edge_array.shape + (1,))), axis=2)
+
                 with Image.open(annotation_file_name) as annotation_object:
                     annotation_data = np.array(annotation_object, dtype=np.uint8)
                     annotation_data = annotation_data.reshape(annotation_data.shape + (1,))
@@ -70,11 +79,14 @@ try:
                 annotation_data = tf.reshape(annotation_data, annotation_data.shape[:2])
                 annotation_array = annotation_data.numpy()
                 image_array = image_data.numpy()
+
+                # Get pixel frequency
                 hist, bin = np.histogram(annotation_array, bins=np.arange(LABELS + 1))
                 label_balance_array_resize += hist
                 pixel_cnt = annotation_array.shape[0] * annotation_array.shape[1]
                 label_pixel_count_array_resize[hist > 0] += pixel_cnt
 
+                # Add data to lists
                 image_array_list.append(image_array)
                 annotation_array_list.append(annotation_array)
                 image_array_list.append(image_array[:, ::-1])
@@ -92,6 +104,8 @@ try:
         annotation_image = Image.fromarray(annotation_data)
         annotation_image.putpalette(palette)
         annotation_image.show()
+
+        image_edge.show()
 
         annotation_data = np.array(annotation_array_list, dtype=np.uint8)
         image_data = np.array(image_array_list, dtype=np.uint8)
@@ -127,7 +141,16 @@ try:
                 image_file_name = image_file_directories["image"] + name[0] + ".jpg"
                 annotation_file_name = image_file_directories["annotation"] + name[0] + ".png"
                 with Image.open(image_file_name) as image_object:
+                    image_object = image_object.convert("RGB")
                     image_data = np.array(image_object, dtype=np.uint8)
+                    # Detect Edges in image
+                    image_edge = image_object.convert("L")
+                    image_dilation = image_edge.filter(ImageFilter.MaxFilter(3))
+                    image_erosion = image_edge.filter(ImageFilter.MinFilter(3))
+                    image_edge = ImageChops.difference(image_dilation, image_erosion)
+                    image_edge_array = np.array(image_edge, dtype=np.uint8)
+                    image_data = np.concatenate((image_data, image_edge_array.reshape(image_edge_array.shape + (1,))), axis=2)
+
                 with Image.open(annotation_file_name) as annotation_object:
                     annotation_data = np.array(annotation_object, dtype=np.uint8)
                     annotation_data = annotation_data.reshape(annotation_data.shape + (1,))
@@ -154,11 +177,14 @@ try:
                 annotation_data = tf.reshape(annotation_data, annotation_data.shape[:2])
                 annotation_array = annotation_data.numpy()
                 image_array = image_data.numpy()
+
+                # Get pixel frequency
                 hist, bin = np.histogram(annotation_array, bins=np.arange(LABELS + 1))
                 label_balance_array_resize += hist
                 pixel_cnt += annotation_array.shape[0] * annotation_array.shape[1]
                 label_pixel_count_array_resize[hist > 0] += pixel_cnt
 
+                # Add data to lists
                 image_array_list.append(image_array)
                 annotation_array_list.append(annotation_array)
                 image_array_list.append(image_array[:, ::-1])
@@ -176,6 +202,8 @@ try:
         annotation_image = Image.fromarray(annotation_data)
         annotation_image.putpalette(palette)
         annotation_image.show()
+
+        image_edge.show()
 
         annotation_data = np.array(annotation_array_list, dtype=np.uint8)
         image_data = np.array(image_array_list, dtype=np.uint8)
@@ -211,7 +239,16 @@ try:
                 image_file_name = image_file_directories["image"] + name[0] + ".jpg"
                 annotation_file_name = image_file_directories["annotation"] + name[0] + ".png"
                 with Image.open(image_file_name) as image_object:
+                    image_object = image_object.convert("RGB")
                     image_data = np.array(image_object, dtype=np.uint8)
+                    # Detect Edges in image
+                    image_edge = image_object.convert("L")
+                    image_dilation = image_edge.filter(ImageFilter.MaxFilter(3))
+                    image_erosion = image_edge.filter(ImageFilter.MinFilter(3))
+                    image_edge = ImageChops.difference(image_dilation, image_erosion)
+                    image_edge_array = np.array(image_edge, dtype=np.uint8)
+                    image_data = np.concatenate((image_data, image_edge_array.reshape(image_edge_array.shape + (1,))), axis=2)
+
                 with Image.open(annotation_file_name) as annotation_object:
                     annotation_data = np.array(annotation_object, dtype=np.uint8)
                     annotation_data = annotation_data.reshape(annotation_data.shape + (1,))
@@ -238,11 +275,14 @@ try:
                 annotation_data = tf.reshape(annotation_data, annotation_data.shape[:2])
                 annotation_array = annotation_data.numpy()
                 image_array = image_data.numpy()
+
+                # Get pixel frequency
                 hist, bin = np.histogram(annotation_array, bins=np.arange(LABELS + 1))
                 label_balance_array_resize += hist
                 pixel_cnt += annotation_array.shape[0] * annotation_array.shape[1]
                 label_pixel_count_array_resize[hist > 0] += pixel_cnt
 
+                # Add data to lists
                 image_array_list.append(image_array)
                 annotation_array_list.append(annotation_array)
                 image_array_list.append(image_array[:, ::-1])
@@ -260,6 +300,8 @@ try:
         annotation_image = Image.fromarray(annotation_data)
         annotation_image.putpalette(palette)
         annotation_image.show()
+
+        image_edge.show()
 
         annotation_data = np.array(annotation_array_list, dtype=np.uint8)
         image_data = np.array(image_array_list, dtype=np.uint8)
