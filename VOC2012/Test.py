@@ -17,14 +17,14 @@ def weighted_SparseCategoricalCrossentropy(classes):
 
 try:
 
-    # TEST_IMAGE = "./data/JPEGImages/2007_004830.jpg"
-    # TEST_ANNOTATION = "./data/SegmentationClass/2007_004830.png"
-    TEST_IMAGE = "./data/JPEGImages/2007_000032.jpg"
-    TEST_ANNOTATION = "./data/SegmentationClass/2007_000032.png"
+    TEST_IMAGE = "./data/JPEGImages/2007_004830.jpg"
+    TEST_ANNOTATION = "./data/SegmentationClass/2007_004830.png"
+    # TEST_IMAGE = "./data/JPEGImages/2007_000032.jpg"
+    # TEST_ANNOTATION = "./data/SegmentationClass/2007_000032.png"
     MODEL_FILE = "TestNet_VOC2012_npz.h5"
     LABELS = 21
     COLOR_DEPTH = 3
-    CROP_HEIGHT = 128 # sensor.LCD[128, 160]
+    CROP_HEIGHT = 128  # sensor.LCD[128, 160]
     CROP_WIDTH = 160
 
     # Load data
