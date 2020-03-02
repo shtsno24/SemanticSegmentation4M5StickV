@@ -28,7 +28,7 @@ try:
     SHUFFLE_SIZE = 100
     TRAIN_DATASET_SIZE = 1464 * 2
     TEST_DATASET_SIZE = 1450 * 2
-    EPOCHS = 100
+    EPOCHS = 500
     LABELS = 21
     COLOR_DEPTH = 3
     CROP_HEIGHT = 128
@@ -67,18 +67,18 @@ try:
         test_dataset = test_dataset.batch(BATCH_SIZE).repeat(-1)
         print(test_dataset, "\n\nDone")
 
-        # Load model
-        print("Load Model...\n\n")
-        model = Model.TestNet()
-        model.summary()
-        print("\nDone")
+    # Load model
+    print("Load Model...\n\n")
+    model = Model.TestNet()
+    model.summary()
+    print("\nDone")
 
     # Train model
     print("\n\nTrain Model...")
     model.compile(loss=Model.weighted_SparseCategoricalCrossentropy(SAMPLE_WEIGHT), optimizer='adam', metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
     model.fit(train_dataset, validation_data=test_dataset, epochs=EPOCHS,
               steps_per_epoch=int(TRAIN_DATASET_SIZE / BATCH_SIZE),
-              validation_steps=int(TEST_DATASET_SIZE / BATCH_SIZE / EPOCHS))
+              validation_steps=int(TEST_DATASET_SIZE / BATCH_SIZE / 100))
     model.save('TestNet_VOC2012_npz.h5')
     print("  Done\n\n")
 
