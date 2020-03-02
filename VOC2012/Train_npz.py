@@ -6,25 +6,26 @@ device_list = device_lib.list_local_devices()
 import Model
 
 
-try:
-    physical_devices = tf.config.experimental.list_physical_devices('GPU')
-    if len(physical_devices) > 0:
-        for k in range(len(physical_devices)):
-            tf.config.experimental.set_memory_growth(physical_devices[k], True)
-            print('memory growth:', tf.config.experimental.get_memory_growth(physical_devices[k]))
-    else:
-        print("Not enough GPU hardware devices available")
-except:
-    import traceback
-    traceback.print_exc()
+gpus = tf.config.experimental.list_physical_devices('GPU')
+if gpus:
+    # Restrict TensorFlow to only allocate 4GB of memory on the first GPU
+    try:
+        tf.config.experimental.set_virtual_device_configuration(
+            gpus[0],
+            [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=4096)])
+        logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+        print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+    except RuntimeError as e:
+        # Virtual devices must be set before GPUs have been initialized
+        print(e)
 
 try:
     # TRAIN_RECORDS = "./data/VOC2012_resize_train.npz"
     # TEST_RECORDS = "./data/VOC2012_resize_val.npz"
     TRAIN_RECORDS = "./VOC2012_resize_train.npz"
     TEST_RECORDS = "./VOC2012_resize_val.npz"
-    BATCH_SIZE = 6
-    SHUFFLE_SIZE = 12
+    BATCH_SIZE = 8
+    SHUFFLE_SIZE = 100
     TRAIN_DATASET_SIZE = 1464 * 2
     TEST_DATASET_SIZE = 1450 * 2
     EPOCHS = 100
