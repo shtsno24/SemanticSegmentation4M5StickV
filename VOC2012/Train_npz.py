@@ -19,10 +19,10 @@ except:
     traceback.print_exc()
 
 try:
-    TRAIN_RECORDS = "./data/VOC2012_resize_train.npz"
-    TEST_RECORDS = "./data/VOC2012_resize_val.npz"
-    # TRAIN_RECORDS = "./VOC2012_resize_train.npz"
-    # TEST_RECORDS = "./VOC2012_resize_val.npz"
+    # TRAIN_RECORDS = "./data/VOC2012_resize_train.npz"
+    # TEST_RECORDS = "./data/VOC2012_resize_val.npz"
+    TRAIN_RECORDS = "./VOC2012_resize_train.npz"
+    TEST_RECORDS = "./VOC2012_resize_val.npz"
     BATCH_SIZE = 6
     SHUFFLE_SIZE = 12
     TRAIN_DATASET_SIZE = 1464 * 2

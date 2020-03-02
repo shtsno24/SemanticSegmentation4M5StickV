@@ -8,7 +8,8 @@ from tensorflow.keras.losses import sparse_categorical_crossentropy
 
 """
 もしかしたら，ResizeNearesetNeighbor，ResizeBilinear, TransposeConvが使えるかも．
-H x W x D : 120 x 160 x 3 -> 120 x 160 x (class)
+H x W x D : 128 x 160 x 3 -> 128 x 160 x (class)
+o_w = in_w + 2 * pad - k_w - (k_w - 1)*(d_w - 1)
 """
 
 
@@ -26,19 +27,22 @@ def weighted_SparseCategoricalCrossentropy(sample_weights, classes=21):
 
 def initial_block(x, input_depth, channel, stride=(2, 2), Momentum=0.1):
     # x_conv = Conv2D(channel - input_depth, kernel_size, padding="same", strides=stride)(x)
-    internal_channel = int((channel - input_depth) / 2)
+    internal_channel = int((channel - input_depth) / 3)
 
-    x_conv_3 = DepthwiseConv2D((3, 3), padding="same")(x)
+    x_conv_3 = ZeroPadding2D(padding=((1, 1), (1, 1)))(x)
+    x_conv_3 = DepthwiseConv2D((3, 3))(x_conv_3)
     x_conv_3 = Activation("relu")(x_conv_3)
     x_conv_3 = Conv2D(internal_channel, (1, 1))(x_conv_3)
     x_conv_3 = Activation("relu")(x_conv_3)
 
-    x_conv_5 = DepthwiseConv2D((5, 5), padding="same")(x)
+    x_conv_5 = ZeroPadding2D(padding=((2, 2), (2, 2)))(x)
+    x_conv_5 = DepthwiseConv2D((5, 5))(x_conv_5)
     x_conv_5 = Activation("relu")(x_conv_5)
     x_conv_5 = Conv2D(internal_channel, (1, 1))(x_conv_5)
     x_conv_5 = Activation("relu")(x_conv_5)
 
-    x_conv_7 = DepthwiseConv2D((7, 7), padding="same")(x)
+    x_conv_7 = ZeroPadding2D(padding=((3, 3), (3, 3)))(x)
+    x_conv_7 = DepthwiseConv2D((7, 7))(x_conv_7)
     x_conv_7 = Activation("relu")(x_conv_7)
     x_conv_7 = Conv2D(internal_channel, (1, 1))(x_conv_7)
     x_conv_7 = Activation("relu")(x_conv_7)
@@ -57,12 +61,15 @@ def initial_block(x, input_depth, channel, stride=(2, 2), Momentum=0.1):
 def bottleneck_downsample(x, output_depth, internal_scale=4, Momentum=0.1):
     internal_depth = int(output_depth / internal_scale)
 
-    x_conv = Conv2D(internal_depth, (2, 2), strides=(2, 2), padding="same")(x)
+    x_conv = Conv2D(internal_depth, (2, 2), strides=(2, 2))(x)
     x_conv = BatchNormalization(momentum=Momentum)(x_conv)
     x_conv = Activation("relu")(x_conv)
-    x_conv = Conv2D(internal_depth, (3, 3), padding="same")(x_conv)
+
+    x_conv = ZeroPadding2D(padding=((1, 1), (1, 1)))(x_conv)
+    x_conv = Conv2D(internal_depth, (3, 3))(x_conv)
     x_conv = BatchNormalization(momentum=Momentum)(x_conv)
     x_conv = Activation("relu")(x_conv)
+
     x_conv = Conv2D(output_depth, (1, 1), use_bias=False)(x_conv)
     x_conv = BatchNormalization(momentum=Momentum)(x_conv)
     x_conv = SpatialDropout2D(0.01)(x_conv)
@@ -80,9 +87,12 @@ def bottleneck(x, output_depth, internal_scale=4, Momentum=0.1):
     x_conv = Conv2D(internal_depth, (1, 1))(x)
     x_conv = BatchNormalization(momentum=Momentum)(x_conv)
     x_conv = Activation("relu")(x_conv)
-    x_conv = Conv2D(internal_depth, (3, 3), padding="same")(x_conv)
+
+    x_conv = ZeroPadding2D(padding=((1, 1), (1, 1)))(x_conv)
+    x_conv = Conv2D(internal_depth, (3, 3))(x_conv)
     x_conv = BatchNormalization(momentum=Momentum)(x_conv)
     x_conv = Activation("relu")(x_conv)
+
     x_conv = Conv2D(output_depth, (1, 1), use_bias=False)(x_conv)
     x_conv = BatchNormalization(momentum=Momentum)(x_conv)
     x_conv = SpatialDropout2D(0.01)(x_conv)
@@ -97,14 +107,19 @@ def bottleneck(x, output_depth, internal_scale=4, Momentum=0.1):
 
 def bottleneck_asymmetric(x, asymmetric, output_depth, internal_scale=4, Momentum=0.1):
     internal_depth = int(output_depth / internal_scale)
+    pad_half = int(asymmetric / 2)
 
     x_conv = Conv2D(internal_depth, (1, 1))(x)
     x_conv = BatchNormalization(momentum=Momentum)(x_conv)
     x_conv = Activation("relu")(x_conv)
-    x_conv = Conv2D(internal_depth, (1, asymmetric), padding="same", use_bias=False)(x_conv)
-    x_conv = Conv2D(internal_depth, (asymmetric, 1), padding="same")(x_conv)
+
+    x_conv = ZeroPadding2D(padding=((0, 0), (pad_half, pad_half)))(x_conv)
+    x_conv = Conv2D(internal_depth, (1, asymmetric), use_bias=False)(x_conv)
+    x_conv = ZeroPadding2D(padding=((pad_half, pad_half), (0, 0)))(x_conv)
+    x_conv = Conv2D(internal_depth, (asymmetric, 1))(x_conv)
     x_conv = BatchNormalization(momentum=Momentum)(x_conv)
     x_conv = Activation("relu")(x_conv)
+
     x_conv = Conv2D(output_depth, (1, 1), use_bias=False)(x_conv)
     x_conv = BatchNormalization(momentum=Momentum)(x_conv)
     x_conv = SpatialDropout2D(0.01)(x_conv)
@@ -123,9 +138,16 @@ def bottleneck_dilated(x, dilated, output_depth, internal_scale=4, Momentum=0.1)
     x_conv = Conv2D(internal_depth, (1, 1))(x)
     x_conv = BatchNormalization(momentum=Momentum)(x_conv)
     x_conv = Activation("relu")(x_conv)
-    x_conv = Conv2D(internal_depth, (3, 3), dilation_rate=(dilated, dilated), padding="same")(x_conv)
+
+    x_conv = ZeroPadding2D(padding=((dilated, dilated), (dilated, dilated)))(x_conv)
+    x_conv = Conv2D(internal_depth, (3, 3), dilation_rate=(dilated, dilated))(x_conv)
     x_conv = BatchNormalization(momentum=Momentum)(x_conv)
     x_conv = Activation("relu")(x_conv)
+    # dilation_rate = 2 : padding = 2
+    # dilation_rate = 4 : padding = 4
+    # dilation_rate = 8 : padding = 8
+    # dilation_rate = 16: padding = 16
+
     x_conv = Conv2D(output_depth, (1, 1), use_bias=False)(x_conv)
     x_conv = BatchNormalization(momentum=Momentum)(x_conv)
     x_conv = SpatialDropout2D(0.01)(x_conv)
