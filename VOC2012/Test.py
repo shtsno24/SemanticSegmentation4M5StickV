@@ -19,8 +19,8 @@ try:
 
     # TEST_IMAGE = "./data/JPEGImages/2007_004830.jpg"
     # TEST_ANNOTATION = "./data/SegmentationClass/2007_004830.png"
-    TEST_IMAGE = "./data/JPEGImages/2007_005294.jpg"
-    TEST_ANNOTATION = "./data/SegmentationClass/2007_005294.png"
+    TEST_IMAGE = "./data/JPEGImages/2007_006560.jpg"
+    TEST_ANNOTATION = "./data/SegmentationClass/2007_006560.png"
     MODEL_FILE = "TestNet_VOC2012_npz.h5"
     LABELS = 21
     COLOR_DEPTH = 3
