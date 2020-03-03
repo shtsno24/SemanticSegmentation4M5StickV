@@ -13,3 +13,6 @@ VOC2012/data/SegmentationClass
 VOC2012/data/SegmentationObject
 VOC2012/data/*.tfrecords
 model_viewer.py
+# keras_conv2d_test.py
+# keras_conv2d_test.h5
+# keras_conv2d_test.tflite

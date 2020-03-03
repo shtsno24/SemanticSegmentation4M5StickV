@@ -73,14 +73,26 @@ try:
     model.summary()
     print("\nDone")
 
-    # Train model
-    print("\n\nTrain Model...")
-    model.compile(loss=Model.weighted_SparseCategoricalCrossentropy(SAMPLE_WEIGHT), optimizer='adam', metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
-    model.fit(train_dataset, validation_data=test_dataset, epochs=EPOCHS,
-              steps_per_epoch=int(TRAIN_DATASET_SIZE / BATCH_SIZE),
-              validation_steps=int(TEST_DATASET_SIZE / BATCH_SIZE / 100))
-    model.save('TestNet_VOC2012_npz.h5')
-    print("  Done\n\n")
+    try:
+        # Train model
+        print("\n\nTrain Model...")
+        model.compile(loss=Model.weighted_SparseCategoricalCrossentropy(SAMPLE_WEIGHT), optimizer='adam', metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
+        model.fit(train_dataset, validation_data=test_dataset, epochs=EPOCHS,
+                steps_per_epoch=int(TRAIN_DATASET_SIZE / BATCH_SIZE),
+                validation_steps=int(TEST_DATASET_SIZE / BATCH_SIZE / 100))
+        print("  Done\n\n")
+    except:
+        import traceback
+        traceback.print_exc()
+
+    try:
+        # Save model
+        print("\n\nSave Model...")
+        model.save('TestNet_VOC2012_npz.h5')
+        print("  Done\n\n")
+    except:
+        import traceback
+        traceback.print_exc()
 
 except:
     import traceback
