@@ -53,7 +53,7 @@ try:
                     image_erosion = image_edge.filter(ImageFilter.MinFilter(3))
                     image_edge = ImageChops.difference(image_dilation, image_erosion)
                     image_edge_array = np.array(image_edge, dtype=np.uint8)
-                    image_data = np.concatenate((image_data, image_edge_array.reshape(image_edge_array.shape + (1,))), axis=2)
+                    # image_data = np.concatenate((image_data, image_edge_array.reshape(image_edge_array.shape + (1,))), axis=2)
 
                 with Image.open(annotation_file_name) as annotation_object:
                     annotation_data = np.array(annotation_object, dtype=np.uint8)
@@ -151,7 +151,7 @@ try:
                     image_erosion = image_edge.filter(ImageFilter.MinFilter(3))
                     image_edge = ImageChops.difference(image_dilation, image_erosion)
                     image_edge_array = np.array(image_edge, dtype=np.uint8)
-                    image_data = np.concatenate((image_data, image_edge_array.reshape(image_edge_array.shape + (1,))), axis=2)
+                    # image_data = np.concatenate((image_data, image_edge_array.reshape(image_edge_array.shape + (1,))), axis=2)
 
                 with Image.open(annotation_file_name) as annotation_object:
                     annotation_data = np.array(annotation_object, dtype=np.uint8)
@@ -249,7 +249,7 @@ try:
                     image_erosion = image_edge.filter(ImageFilter.MinFilter(3))
                     image_edge = ImageChops.difference(image_dilation, image_erosion)
                     image_edge_array = np.array(image_edge, dtype=np.uint8)
-                    image_data = np.concatenate((image_data, image_edge_array.reshape(image_edge_array.shape + (1,))), axis=2)
+                    # image_data = np.concatenate((image_data, image_edge_array.reshape(image_edge_array.shape + (1,))), axis=2)
 
                 with Image.open(annotation_file_name) as annotation_object:
                     annotation_data = np.array(annotation_object, dtype=np.uint8)

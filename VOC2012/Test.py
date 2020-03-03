@@ -45,7 +45,7 @@ try:
         image_edge_data = np.array(image_edge, dtype=np.uint8)
 
         image_data = np.array(image_object, dtype=np.uint8)
-        image_data = np.concatenate((image_data, image_edge_data.reshape(image_edge_data.shape + (1,))), axis=2)
+        # image_data = np.concatenate((image_data, image_edge_data.reshape(image_edge_data.shape + (1,))), axis=2)
         image_data = image_data.reshape((1,) + image_data.shape)
 
         # Resizeing data
@@ -87,8 +87,8 @@ try:
     image_buffer = image_data.numpy()
     image_object = Image.fromarray(image_buffer[:, :, :, 0:3].reshape((CROP_HEIGHT, CROP_WIDTH, COLOR_DEPTH)).astype(np.uint8))
     image_object.save("Test_Image.png")
-    edge_object = Image.fromarray(image_buffer[:, :, :, 3:4].reshape((CROP_HEIGHT, CROP_WIDTH)).astype(np.uint8))
-    edge_object.save("Edge_Image.png")
+    # edge_object = Image.fromarray(image_buffer[:, :, :, 3:4].reshape((CROP_HEIGHT, CROP_WIDTH)).astype(np.uint8))
+    # edge_object.save("Edge_Image.png")
     print("\nDone")
 except:
     import traceback
