@@ -5,20 +5,17 @@ git clone https://github.com/sipeed/Maix_Toolbox.git
 cd ./Maix_Toolbox/
 
 mkdir -p ncc
-masudalab@masudalab-ubuntu:~/Maix_Toolbox$ mkdir -p workspace
-masudalab@masudalab-ubuntu:~/Maix_Toolbox$ mkdir -p images
-masudalab@masudalab-ubuntu:~/Maix_Toolbox$ mkdir -p log
 
 cd ./ncc
 
 wget https://github.com/kendryte/nncase/releases/download/v0.2.0-beta2/ncc_linux_x86_64.tar.xz
 
-tar -Jxf ncc_linux_x86_64.tar.xz 
-masudalab@masudalab-ubuntu:~/Maix_Toolbox/ncc$ rm ncc_linux_x86_64.tar.xz
+tar -Jxf ncc_-_linux_x86_64.tar.xz
+rm ncc_linux_x86_64.tar.xz
 
 cd ./..
 
-./ncc/ncc compile ~/Segmentation4M5StickV/VOC2012/TestNet_VOC2012_npz.tflite ~/Segmentation4M5StickV//VOC2012/TestNet_VOC2012_npz.kmodel -i tflite -o kmodel --dataset ~/Segmentation4M5StickV/VOC2012/data/JPEGImages_Sample/
+./ncc/ncc compile ~/Segmentation4M5StickV/VOC2012/TestNet_VOC2012_npz.tflite ~/Segmentation4M5StickV/VOC2012/TestNet_VOC2012_npz.kmodel -i tflite -o kmodel --dataset ~/Segmentation4M5StickV/VOC2012/data/JPEGImages_Sample/
 
 1. Import graph...
 2. Optimize Pass 1...
