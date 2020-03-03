@@ -9,6 +9,7 @@ scene_parse150/data/*.tfrecords
 
 VOC2012/data/ImageSets
 VOC2012/data/JPEGImages
+VOC2012/data/JPEGImages_Sample
 VOC2012/data/SegmentationClass
 VOC2012/data/SegmentationObject
 VOC2012/data/*.tfrecords
