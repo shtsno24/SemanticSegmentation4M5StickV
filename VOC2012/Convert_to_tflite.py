@@ -1,12 +1,14 @@
 import tensorflow as tf
 import numpy as np
-import Model_V0_2 as Model
+import Model_V0_1 as Model
 
 try:
     # MODEL_FILE = "TestNet_VOC2012_npz.h5"
     # MODEL_TFLITE = "TestNet_VOC2012_npz.tflite"
-    MODEL_FILE = "model_viewer.h5"
-    MODEL_TFLITE = "model_viewer.tflite"
+    # MODEL_FILE = "model_viewer.h5"
+    # MODEL_TFLITE = "model_viewer.tflite"
+    MODEL_FILE = "Model_V0_1.h5"
+    MODEL_TFLITE = "Model_V0_1.tflite"
     LABELS = 21
     COLOR_DEPTH = 3
     CROP_HEIGHT = 128  # sensor.LCD[128, 160]

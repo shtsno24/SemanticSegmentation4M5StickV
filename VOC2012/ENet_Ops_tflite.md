@@ -1,9 +1,9 @@
 # Supported Ops used in ENet  
 
-| Operator | Is Supported |  
-|:-------------------:|:---:|  
-| Conv2D | ✅ |  
-| DepthwiseConv2D | ✅ |  
+| Operator | Is Supported | keras |  
+|:-------------------:|:---:| :---:|  
+| Conv2D | ✅ | Conv2D |  
+| DepthwiseConv2D | ✅ | DepthwiseConv2D |  
 | TransposeConv | ✅ |  
 | Relu | ✅(Newest) |  
 | MaxPool2D | ✅ |  

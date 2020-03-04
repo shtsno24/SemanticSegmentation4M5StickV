@@ -3,7 +3,7 @@ import tensorflow as tf
 from tensorflow.python.client import device_lib
 device_list = device_lib.list_local_devices()
 
-import Model_V0_2 as Model
+import Model_V0_1 as Model
 
 
 gpus = tf.config.experimental.list_physical_devices('GPU')
@@ -88,7 +88,7 @@ try:
     try:
         # Save model
         print("\n\nSave Model...")
-        model.save('TestNet_VOC2012_npz.h5')
+        model.save('Model_V0_1.h5')
         print("  Done\n\n")
     except:
         import traceback
