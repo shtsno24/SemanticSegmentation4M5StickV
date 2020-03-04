@@ -3,7 +3,7 @@ import tensorflow as tf
 from tensorflow.python.client import device_lib
 device_list = device_lib.list_local_devices()
 
-import Model
+import Model_V0_2 as Model
 
 
 gpus = tf.config.experimental.list_physical_devices('GPU')

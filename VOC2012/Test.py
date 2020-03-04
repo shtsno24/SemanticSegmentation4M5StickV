@@ -2,8 +2,6 @@ import numpy as np
 import tensorflow as tf
 from PIL import Image, ImageFilter, ImageChops
 
-import Model
-
 
 def weighted_SparseCategoricalCrossentropy(classes):
     def loss_function(y_true, y_pred):

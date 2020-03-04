@@ -1,10 +1,12 @@
 import tensorflow as tf
 import numpy as np
-import Model
+import Model_V0_2 as Model
 
 try:
-    MODEL_FILE = "TestNet_VOC2012_npz.h5"
-    MODEL_TFLITE = "TestNet_VOC2012_npz.tflite"
+    # MODEL_FILE = "TestNet_VOC2012_npz.h5"
+    # MODEL_TFLITE = "TestNet_VOC2012_npz.tflite"
+    MODEL_FILE = "model_viewer.h5"
+    MODEL_TFLITE = "model_viewer.tflite"
     LABELS = 21
     COLOR_DEPTH = 3
     CROP_HEIGHT = 128  # sensor.LCD[128, 160]
@@ -13,7 +15,7 @@ try:
     with tf.device('/cpu:0'):
         # Load model
         print("\n\nLoad Model...\n")
-        model = tf.keras.models.load_model(MODEL_FILE,  custom_objects={'loss_function': Model.weighted_SparseCategoricalCrossentropy(LABELS)})
+        model = tf.keras.models.load_model(MODEL_FILE, custom_objects={'loss_function': Model.weighted_SparseCategoricalCrossentropy(LABELS)})
         model.summary()
         print("\nDone")
 
@@ -21,7 +23,7 @@ try:
         converter.target_ops = [tf.lite.OpsSet.TFLITE_BUILTINS,
                                 tf.lite.OpsSet.SELECT_TF_OPS]
         tfmodel = converter.convert() 
-        with open (MODEL_TFLITE, "wb") as m:
+        with open(MODEL_TFLITE, "wb") as m:
             m.write(tfmodel)
 
         interpreter = tf.lite.Interpreter(model_path=MODEL_TFLITE)
