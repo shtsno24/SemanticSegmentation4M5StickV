@@ -1,9 +1,5 @@
 # How To Use NNCASE(V0.2.0)
 
-git clone https://github.com/sipeed/Maix_Toolbox.git
-
-cd ./Maix_Toolbox/
-
 mkdir -p ncc
 
 cd ./ncc

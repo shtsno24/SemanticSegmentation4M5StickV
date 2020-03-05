@@ -215,7 +215,9 @@ def TestNet(input_shape=(128, 160, 3), classes=21):
 """
 
 
-def TestNet(input_shape=(128, 160, 3), classes=21):
+def TestNet():
+    input_shape=(128, 160, 3)
+    classes=21
     inputs = Input(shape=input_shape)
 
     x = Multiscale_Depthwise_Conv(inputs, classes)
