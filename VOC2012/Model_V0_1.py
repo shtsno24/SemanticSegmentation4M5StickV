@@ -225,7 +225,8 @@ def TestNet(input_shape=None, classes=21):
     Momentum = 0.1
     Droprate = 0.01
 
-    x = Conv2D(internal_depth, (1, 1))(inputs)
+    x = MaxPooling2D(pool_size=(4, 4))(inputs)
+    x = Conv2D(internal_depth, (1, 1))(x)
     x = ReLU()(x)
 
     x_3_pad = ZeroPadding2D(padding=((1, 1), (1, 1)))(x)
