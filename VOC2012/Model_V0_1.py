@@ -220,22 +220,22 @@ def TestNet(input_shape=(128, 160, 3), classes=21):
 
     # x = Multiscale_Depthwise_Conv(inputs, classes)
     out_depth = classes
-    internal_scale = 8
+    internal_scale = 21
     internal_depth = int(out_depth / internal_scale)
     Momentum = 0.1
     Droprate = 0.01
 
-    x = MaxPooling2D(pool_size=(16, 16))(inputs)
+    x = MaxPooling2D(pool_size=(4, 4))(inputs)
     x = Conv2D(internal_depth, (1, 1))(x)
     x = ReLU()(x)
 
-    x_3 = ZeroPadding2D(padding=((1, 1), (1, 1)))(x)
-    x_3 = DepthwiseConv2D((3, 3))(x_3)
+    # x_3 = ZeroPadding2D(padding=((1, 1), (1, 1)))(x)
+    x_3 = DepthwiseConv2D((3, 3), padding="same")(x)
     x_3 = BatchNormalization(momentum=Momentum)(x_3)
     x_3 = ReLU()(x_3)
 
-    x_5 = ZeroPadding2D(padding=((1, 1), (1, 1)))(x_3)
-    x_5 = DepthwiseConv2D((3, 3))(x_5)
+    # x_5 = ZeroPadding2D(padding=((1, 1), (1, 1)))(x_3)
+    x_5 = DepthwiseConv2D((3, 3), padding="same")(x_3)
     x_5 = BatchNormalization(momentum=Momentum)(x_5)
     x_5 = ReLU()(x_5)
 
@@ -243,11 +243,11 @@ def TestNet(input_shape=(128, 160, 3), classes=21):
     x = Conv2D(out_depth, (1, 1))(x)
     x = BatchNormalization(momentum=Momentum)(x)
     x = SpatialDropout2D(Droprate)(x)
-    x = UpSampling2D(size=(16, 16))(x)
+    outputs = Softmax()(x)
+    outputs = UpSampling2D(size=(4, 4))(outputs)
 
 
     # 128 x 160 x classes
-    outputs = Softmax()(x)
 
     model = Model(inputs, outputs)
     return model
