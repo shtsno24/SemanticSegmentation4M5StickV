@@ -240,10 +240,11 @@ def TestNet(input_shape=(128, 160, 3), classes=21):
     x_5 = ReLU()(x_5)
 
     x = Concatenate(axis=3)([x_3, x_5])
-    x = UpSampling2D(size=(16, 16))(x)
     x = Conv2D(out_depth, (1, 1))(x)
     x = BatchNormalization(momentum=Momentum)(x)
     x = SpatialDropout2D(Droprate)(x)
+    x = UpSampling2D(size=(16, 16))(x)
+
 
     # 128 x 160 x classes
     outputs = Softmax()(x)
