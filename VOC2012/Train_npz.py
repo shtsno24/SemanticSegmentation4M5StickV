@@ -44,7 +44,7 @@ try:
             label_pixel_count_array_resize = f["label_pix_cnt_resize"]
         annotation_data = annotation_data.astype(np.float32)
         image_data = image_data.astype(np.float32)
-        # image_data /= 255.0
+        image_data /= 255.0
 
         image_freq = label_balance_array_resize / label_pixel_count_array_resize
         CLASS_WEIGHT = {i: (np.median(image_freq) / image_freq)[i] for i in range(LABELS)}
@@ -62,7 +62,7 @@ try:
             annotation_data = f["annotation"]
         annotation_data = annotation_data.astype(np.float32)
         image_data = image_data.astype(np.float32)
-        # image_data /= 255.0
+        image_data /= 255.0
         test_dataset = tf.data.Dataset.from_tensor_slices((image_data, annotation_data))
         test_dataset = test_dataset.batch(BATCH_SIZE).repeat(-1)
         print(test_dataset, "\n\nDone")
