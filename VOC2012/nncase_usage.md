@@ -38,8 +38,9 @@ cd ./..
   OUTPUTS  
   0	Identity	1x21x128x160  
 
+## nncase V0.2.0 (Model_V0_1)  
 
-./ncc/ncc compile ~/Segmentation4M5StickV/VOC2012/Model_V0_1.tflite ~/Segmentation4M5StickV/VOC2012/Model_V0_1.kmodel -i tflite -o kmodel --dataset ~/Segmentation4M5StickV/VOC2012/data/JPEGImages_Sample/ --inference-type uint8 --dump-ir --max-allocator-solve-secs 120
+./ncc/ncc compile ~/Segmentation4M5StickV/VOC2012/Model_V0_1.tflite ~/Segmentation4M5StickV/VOC2012/Model_V0_1.kmodel -i tflite -o kmodel --dataset ~/Segmentation4M5StickV/VOC2012/data/JPEGImages_Sample/ --inference-type uint8 --dump-ir --max-allocator-solve-secs 120 --dataset-format image --input-std 0.0039216 --input-mean 0 --calibrate-method l2
 
 1. Import graph...
 2. Optimize Pass 1...
@@ -49,16 +50,42 @@ cd ./..
   4.2. Get activation ranges...
   Plan buffers...
   Run calibration...
-  [==================================================] 100% 0.254s
+  [==================================================] 100% 0.221s
+  4.3. Get activation distributions...
+  Plan buffers...
+  Run calibration...
+  [==================================================] 100% 0.262s
+  4.4. Find optimal thresholds...
+{-853.329, 0} -> {-851.245, -0.416687}               ] 0% 0s
+{0, 1.1} -> {0, 0.999561}                            ] 5% 0.049s
+{0, 853.329} -> {0, 848.329}                         ] 10% 0.077s
+{-0.666291, 712.877} -> {-0.317881, 712.529}         ] 15% 0.105s
+{0, 31.6228} -> {0, 31.6228}                         ] 20% 0.161s
+{0, 414.761} -> {0, 414.356}                         ] 25% 0.189s
+{-0.666291, 0.0069381} -> {-0.665962, 0.00660938}    ] 30% 0.217s
+{-1000, 414.335} -> {-997.238, 407.429}              ] 34% 0.773s
+{-853.329, 0} -> {-851.245, -0.416687}               ] 40% 12.458s
+{0, 1} -> {0, 0.993164}==>                           ] 44% 12.507s
+{0, 13.0237} -> {0, 13.0173}>                        ] 50% 12.535s
+{0, 393.799} -> {0, 393.223}==>                      ] 55% 12.563s
+{0, 254.998} -> {0, 254.749}=====>                   ] 60% 12.591s
+{-278.492, 80.8678} -> {-275.509, 79.2886}           ] 64% 12.62s
+{0, 1.25777} -> {0, 1.25777}==========>              ] 69% 22.305s
+{0, 1} -> {0, 1}========================>            ] 75% 22.333s
+{0, 31.6228} -> {0, 31.6228}===============>         ] 80% 22.361s
+{0, 713.371} -> {0, 713.022}=================>       ] 85% 22.389s
+{0, 853.329} -> {0, 850.829}====================>    ] 89% 22.417s
+{-278.492, 80.8678} -> {-275.509, 79.2886}========>  ] 94% 22.445s
+  [==================================================] 100% 32.194s
   4.5. Quantize graph...
 5. Lowering...
 6. Generate code...
   Plan buffers...
   Emit code...
-Main memory usage: 3870720 B
+Main memory usage: 3440640 B
 
 SUMMARY
 INPUTS
-0	Input_0	1x3x128x160
+0	input_1	1x3x128x160
 OUTPUTS
 0	Identity	1x21x128x160
