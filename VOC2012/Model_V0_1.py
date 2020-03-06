@@ -225,37 +225,25 @@ def TestNet(input_shape=(128, 160, 3), classes=21):
     Momentum = 0.1
     Droprate = 0.01
 
-    x = MaxPooling2D(pool_size=(16, 16))(inputs)
+    x = MaxPooling2D(pool_size=(4, 4))(inputs)
     x = Conv2D(internal_depth, (1, 1))(x)
     x = ReLU()(x)
 
-    x_3_pad = ZeroPadding2D(padding=((1, 1), (1, 1)))(x)
-    # x_5_pad = ZeroPadding2D(padding=((1, 1), (1, 1)))(x_3_pad)
-    # x_7_pad = ZeroPadding2D(padding=((1, 1), (1, 1)))(x_5_pad)
-
-    x_3 = DepthwiseConv2D((3, 3))(x_3_pad)
-    x_3 = UpSampling2D(size=(16, 16))(x_3)
-    # x_3 = BatchNormalization(momentum=Momentum)(x_3)
+    x_3 = ZeroPadding2D(padding=((1, 1), (1, 1)))(x)
+    x_3 = DepthwiseConv2D((3, 3))(x_3)
+    x_3 = BatchNormalization(momentum=Momentum)(x_3)
     x_3 = ReLU()(x_3)
 
-    # x_5 = DepthwiseConv2D((5, 5))(x_5_pad)
-    # x_5 = BatchNormalization(momentum=Momentum)(x_5)
-    # x_5 = ReLU()(x_5)
+    x_5 = ZeroPadding2D(padding=((1, 1), (1, 1)))(x_3)
+    x_5 = DepthwiseConv2D((3, 3))(x_5)
+    x_5 = BatchNormalization(momentum=Momentum)(x_5)
+    x_5 = ReLU()(x_5)
 
-    # x_7 = DepthwiseConv2D((7, 7))(x_7_pad)
-    # x_7 = BatchNormalization(momentum=Momentum)(x_7)
-    # x_7 = ReLU()(x_7)
-
-    # x = MaxPooling2D(pool_size=(2, 2))(x)
-    # x = UpSampling2D(size=(2, 2))(x)
-
-    # x = Concatenate(axis=3)([x, x_3, x_5, x_7])
-    # x = Concatenate(axis=3)([x, x_3])
-    # x = BatchNormalization(momentum=Momentum)(x_3)
-    x = SpatialDropout2D(Droprate)(x_3)
+    x = Concatenate(axis=3)([x_3, x_5])
+    x = UpSampling2D(size=(4, 4))(x)
+    x = BatchNormalization(momentum=Momentum)(x)
+    x = SpatialDropout2D(Droprate)(x)
     x = Conv2D(out_depth, (1, 1))(x)
-    # x = BatchNormalization(momentum=Momentum)(x)
-    # x = ReLU()(x)
 
     # 128 x 160 x classes
     outputs = Softmax()(x)
