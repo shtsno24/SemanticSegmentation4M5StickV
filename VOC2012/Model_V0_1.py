@@ -225,7 +225,7 @@ def TestNet(input_shape=(128, 160, 3), classes=21):
     Momentum = 0.1
     Droprate = 0.01
 
-    x = MaxPooling2D(pool_size=(4, 4))(inputs)
+    x = MaxPooling2D(pool_size=(16, 16))(inputs)
     x = Conv2D(internal_depth, (1, 1))(x)
     x = ReLU()(x)
 
@@ -240,7 +240,7 @@ def TestNet(input_shape=(128, 160, 3), classes=21):
     x_5 = ReLU()(x_5)
 
     x = Concatenate(axis=3)([x_3, x_5])
-    x = UpSampling2D(size=(4, 4))(x)
+    x = UpSampling2D(size=(16, 16))(x)
     x = Conv2D(out_depth, (1, 1))(x)
     x = BatchNormalization(momentum=Momentum)(x)
     x = SpatialDropout2D(Droprate)(x)
