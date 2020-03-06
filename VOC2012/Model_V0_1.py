@@ -220,7 +220,7 @@ def TestNet(input_shape=(128, 160, 3), classes=21):
 
     # x = Multiscale_Depthwise_Conv(inputs, classes)
     out_depth = classes
-    internal_scale = 4
+    internal_scale = 8
     internal_depth = int(out_depth / internal_scale)
     Momentum = 0.1
     Droprate = 0.01
@@ -241,9 +241,9 @@ def TestNet(input_shape=(128, 160, 3), classes=21):
 
     x = Concatenate(axis=3)([x_3, x_5])
     x = UpSampling2D(size=(4, 4))(x)
+    x = Conv2D(out_depth, (1, 1))(x)
     x = BatchNormalization(momentum=Momentum)(x)
     x = SpatialDropout2D(Droprate)(x)
-    x = Conv2D(out_depth, (1, 1))(x)
 
     # 128 x 160 x classes
     outputs = Softmax()(x)
