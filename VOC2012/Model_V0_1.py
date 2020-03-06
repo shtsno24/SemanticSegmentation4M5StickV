@@ -235,7 +235,7 @@ def TestNet(input_shape=(128, 160, 3), classes=21):
     x_3 = ReLU()(x_3)
 
     # x_5 = ZeroPadding2D(padding=((1, 1), (1, 1)))(x_3)
-    x_5 = DepthwiseConv2D((3, 3), padding="same")(x_3)
+    x_5 = DepthwiseConv2D((5, 5), padding="same")(x)
     x_5 = BatchNormalization(momentum=Momentum)(x_5)
     x_5 = ReLU()(x_5)
 
