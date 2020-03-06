@@ -40,7 +40,7 @@ cd ./..
 
 ## nncase V0.2.0 (Model_V0_1)  
 
-./ncc/ncc compile ~/Segmentation4M5StickV/VOC2012/Model_V0_1.tflite ~/Segmentation4M5StickV/VOC2012/Model_V0_1.kmodel -i tflite -o kmodel --dataset ~/Segmentation4M5StickV/VOC2012/data/JPEGImages_Sample/ --inference-type uint8 --dump-ir --max-allocator-solve-secs 120 --dataset-format image --input-std 0.0039216 --input-mean 0 --calibrate-method l2
+./ncc/ncc compile ~/Segmentation4M5StickV/VOC2012/Model_V0_1.tflite ~/Segmentation4M5StickV/VOC2012/Model_V0_1.kmodel -i tflite -o kmodel --dataset ~/Segmentation4M5StickV/VOC2012/data/JPEGImages_Sample/ --dataset-format image --inference-type uint8 --input-mean 0 --input-std 0.0039216 --dump-ir --input-type uint8 --max-allocator-solve-secs 120 --calibrate-method l2
 
 1. Import graph...
 2. Optimize Pass 1...
