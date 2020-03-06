@@ -235,7 +235,7 @@ def TestNet(input_shape=(128, 160, 3), classes=21):
 
     x_3 = DepthwiseConv2D((3, 3))(x_3_pad)
     x_3 = UpSampling2D(size=(16, 16))(x_3)
-    x_3 = BatchNormalization(momentum=Momentum)(x_3)
+    # x_3 = BatchNormalization(momentum=Momentum)(x_3)
     x_3 = ReLU()(x_3)
 
     # x_5 = DepthwiseConv2D((5, 5))(x_5_pad)
@@ -251,11 +251,11 @@ def TestNet(input_shape=(128, 160, 3), classes=21):
 
     # x = Concatenate(axis=3)([x, x_3, x_5, x_7])
     # x = Concatenate(axis=3)([x, x_3])
-    x = BatchNormalization(momentum=Momentum)(x_3)
-    x = SpatialDropout2D(Droprate)(x)
+    # x = BatchNormalization(momentum=Momentum)(x_3)
+    x = SpatialDropout2D(Droprate)(x_3)
     x = Conv2D(out_depth, (1, 1))(x)
-    x = BatchNormalization(momentum=Momentum)(x)
-    x = ReLU()(x)
+    # x = BatchNormalization(momentum=Momentum)(x)
+    # x = ReLU()(x)
 
     # 128 x 160 x classes
     outputs = Softmax()(x)
