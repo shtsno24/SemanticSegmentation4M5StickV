@@ -215,7 +215,7 @@ def TestNet(input_shape=(128, 160, 3), classes=21):
 """
 
 
-def TestNet(input_shape=None, classes=21):
+def TestNet(input_shape=(128, 160, 3), classes=21):
     inputs = Input(shape=input_shape)
 
     # x = Multiscale_Depthwise_Conv(inputs, classes)
@@ -225,7 +225,7 @@ def TestNet(input_shape=None, classes=21):
     Momentum = 0.1
     Droprate = 0.01
 
-    x = MaxPooling2D(pool_size=(4, 4))(inputs)
+    x = MaxPooling2D(pool_size=(16, 16))(inputs)
     x = Conv2D(internal_depth, (1, 1))(x)
     x = ReLU()(x)
 
@@ -234,6 +234,7 @@ def TestNet(input_shape=None, classes=21):
     # x_7_pad = ZeroPadding2D(padding=((1, 1), (1, 1)))(x_5_pad)
 
     x_3 = DepthwiseConv2D((3, 3))(x_3_pad)
+    x_3 = UpSampling2D(size=(16, 16))(x_3)
     x_3 = BatchNormalization(momentum=Momentum)(x_3)
     x_3 = ReLU()(x_3)
 
