@@ -25,19 +25,18 @@ def Multiscale_Depthwise_Conv(x, out_depth, internal_scale=4, Momentum=0.1, Drop
     x = Conv2D(internal_depth, (1, 1))(x)
     x = ReLU()(x)
 
-    x_3_pad = ZeroPadding2D(padding=((1, 1), (1, 1)))(x)
-    x_5_pad = ZeroPadding2D(padding=((1, 1), (1, 1)))(x_3_pad)
-    x_7_pad = ZeroPadding2D(padding=((1, 1), (1, 1)))(x_5_pad)
-
-    x_3 = DepthwiseConv2D((3, 3))(x_3_pad)
+    x_3 = ZeroPadding2D(padding=((1, 1), (1, 1)))(x)
+    x_3 = DepthwiseConv2D((3, 3))(x_3)
     x_3 = BatchNormalization(momentum=Momentum)(x_3)
     x_3 = ReLU()(x_3)
 
-    x_5 = DepthwiseConv2D((5, 5))(x_5_pad)
+    x_5 = ZeroPadding2D(padding=((1, 1), (1, 1)))(x_3)
+    x_5 = DepthwiseConv2D((3, 3))(x_5)
     x_5 = BatchNormalization(momentum=Momentum)(x_5)
     x_5 = ReLU()(x_5)
 
-    x_7 = DepthwiseConv2D((7, 7))(x_7_pad)
+    x_7 = ZeroPadding2D(padding=((1, 1), (1, 1)))(x_5)
+    x_7 = DepthwiseConv2D((3, 3))(x_7)
     x_7 = BatchNormalization(momentum=Momentum)(x_7)
     x_7 = ReLU()(x_7)
 
@@ -45,10 +44,9 @@ def Multiscale_Depthwise_Conv(x, out_depth, internal_scale=4, Momentum=0.1, Drop
     x = UpSampling2D(size=(2, 2))(x)
 
     x = Concatenate(axis=3)([x, x_3, x_5, x_7])
-    # x = BatchNormalization(momentum=Momentum)(x)
-    x = SpatialDropout2D(Droprate)(x)
     x = Conv2D(out_depth, (1, 1))(x)
     x = BatchNormalization(momentum=Momentum)(x)
+    x = SpatialDropout2D(Droprate)(x)
     x = ReLU()(x)
 
     return x
@@ -60,28 +58,26 @@ def Multiscale_Depthwise_Conv_Downsize(x, out_depth, internal_scale=4, Momentum=
     x = Conv2D(internal_depth, (1, 1))(x)
     x = ReLU()(x)
 
-    x_3_pad = ZeroPadding2D(padding=((1, 1), (1, 1)))(x)
-    x_5_pad = ZeroPadding2D(padding=((1, 1), (1, 1)))(x_3_pad)
-    x_7_pad = ZeroPadding2D(padding=((1, 1), (1, 1)))(x_5_pad)
-
-    x_3 = DepthwiseConv2D((3, 3))(x_3_pad)
+    x_3 = ZeroPadding2D(padding=((1, 1), (1, 1)))(x)
+    x_3 = DepthwiseConv2D((3, 3))(x_3)
     x_3 = BatchNormalization(momentum=Momentum)(x_3)
     x_3 = ReLU()(x_3)
 
-    x_5 = DepthwiseConv2D((5, 5))(x_5_pad)
+    x_5 = ZeroPadding2D(padding=((1, 1), (1, 1)))(x_3)
+    x_5 = DepthwiseConv2D((3, 3))(x_5)
     x_5 = BatchNormalization(momentum=Momentum)(x_5)
     x_5 = ReLU()(x_5)
 
-    x_7 = DepthwiseConv2D((7, 7))(x_7_pad)
+    x_7 = ZeroPadding2D(padding=((1, 1), (1, 1)))(x_5)
+    x_7 = DepthwiseConv2D((3, 3))(x_7)
     x_7 = BatchNormalization(momentum=Momentum)(x_7)
     x_7 = ReLU()(x_7)
 
     x = Concatenate(axis=3)([x, x_3, x_5, x_7])
     x = MaxPooling2D(pool_size=(2, 2))(x)
-    # x = BatchNormalization(momentum=Momentum)(x)
-    x = SpatialDropout2D(Droprate)(x)
     x = Conv2D(out_depth, (1, 1))(x)
     x = BatchNormalization(momentum=Momentum)(x)
+    x = SpatialDropout2D(Droprate)(x)
     x = ReLU()(x)
 
     return x
@@ -93,19 +89,18 @@ def Multiscale_Depthwise_Conv_Upsize(x, out_depth, internal_scale=4, Momentum=0.
     x = Conv2D(internal_depth, (1, 1))(x)
     x = ReLU()(x)
 
-    x_3_pad = ZeroPadding2D(padding=((1, 1), (1, 1)))(x)
-    x_5_pad = ZeroPadding2D(padding=((1, 1), (1, 1)))(x_3_pad)
-    x_7_pad = ZeroPadding2D(padding=((1, 1), (1, 1)))(x_5_pad)
-
-    x_3 = DepthwiseConv2D((3, 3))(x_3_pad)
+    x_3 = ZeroPadding2D(padding=((1, 1), (1, 1)))(x)
+    x_3 = DepthwiseConv2D((3, 3))(x_3)
     x_3 = BatchNormalization(momentum=Momentum)(x_3)
     x_3 = ReLU()(x_3)
 
-    x_5 = DepthwiseConv2D((5, 5))(x_5_pad)
+    x_5 = ZeroPadding2D(padding=((1, 1), (1, 1)))(x_3)
+    x_5 = DepthwiseConv2D((3, 3))(x_5)
     x_5 = BatchNormalization(momentum=Momentum)(x_5)
     x_5 = ReLU()(x_5)
 
-    x_7 = DepthwiseConv2D((7, 7))(x_7_pad)
+    x_7 = ZeroPadding2D(padding=((1, 1), (1, 1)))(x_5)
+    x_7 = DepthwiseConv2D((3, 3))(x_7)
     x_7 = BatchNormalization(momentum=Momentum)(x_7)
     x_7 = ReLU()(x_7)
 
@@ -114,41 +109,11 @@ def Multiscale_Depthwise_Conv_Upsize(x, out_depth, internal_scale=4, Momentum=0.
 
     x = ZeroPadding2D(padding=((1, 1), (1, 1)))(x)
     x = DepthwiseConv2D((3, 3))(x)
-    # x = BatchNormalization(momentum=Momentum)(x)
-    x = SpatialDropout2D(Droprate)(x)
-    x = ReLU()(x)
     x = Conv2D(out_depth, (1, 1))(x)
     x = BatchNormalization(momentum=Momentum)(x)
-    x = ReLU()(x)
-
-    return x
-
-
-def Multiscale_Concat(x_0, x_1, x_2, x_3, x_4, out_depth, internal_scale=4, Momentum=0.1, Droprate=0.01, Alpha=0.1):
-    internal_channel = int(out_depth / internal_scale)
-
-    x_0_pool = MaxPooling2D(pool_size=(4, 4))(x_0)
-    x_0_pool = Conv2D(internal_channel, (1, 1))(x_0_pool)
-    x_0_pool = ReLU()(x_0_pool)
-
-    x_1_pool = MaxPooling2D(pool_size=(2, 2))(x_1)
-    x_1_pool = Conv2D(internal_channel, (1, 1))(x_1_pool)
-    x_1_pool = ReLU()(x_1_pool)
-
-    x_3 = UpSampling2D(size=(2, 2))(x_3)
-    x_3 = Conv2D(internal_channel, (1, 1))(x_3)
-    x_3 = ReLU()(x_3)
-
-    x_4 = UpSampling2D(size=(4, 4))(x_4)
-    x_4 = Conv2D(internal_channel, (1, 1))(x_4)
-    x_4 = ReLU()(x_4)
-
-    x = Concatenate(axis=3)([x_0_pool, x_1_pool, x_2, x_3, x_4])
-    # x = BatchNormalization(momentum=Momentum)(x)
     x = SpatialDropout2D(Droprate)(x)
-    x = Conv2D(out_depth, (1, 1))(x)
-    x = BatchNormalization(momentum=Momentum)(x)
     x = ReLU()(x)
+
     return x
 
 
@@ -218,36 +183,41 @@ def TestNet(input_shape=(128, 160, 3), classes=21):
 def TestNet(input_shape=(128, 160, 3), classes=21):
     inputs = Input(shape=input_shape)
 
-    # x = Multiscale_Depthwise_Conv(inputs, classes)
-    out_depth = classes
-    internal_scale = 21
-    internal_depth = int(out_depth / internal_scale)
-    Momentum = 0.1
-    Droprate = 0.01
+    # x = MaxPooling2D(pool_size=(4, 4))(inputs)
 
-    x = MaxPooling2D(pool_size=(4, 4))(inputs)
-    x = Conv2D(internal_depth, (1, 1))(x)
-    x = ReLU()(x)
+    x_2 = Multiscale_Depthwise_Conv_Downsize(inputs, 16)
+    x_2 = Multiscale_Depthwise_Conv(x_2, 16)
 
-    # x_3 = ZeroPadding2D(padding=((1, 1), (1, 1)))(x)
-    x_3 = DepthwiseConv2D((3, 3), padding="same")(x)
-    x_3 = BatchNormalization(momentum=Momentum)(x_3)
-    x_3 = ReLU()(x_3)
+    x_4 = Multiscale_Depthwise_Conv_Downsize(x_2, 32)
+    x_4 = Multiscale_Depthwise_Conv(x_4, 32)
+    x_4 = Multiscale_Depthwise_Conv(x_4, 32)
 
-    # x_5 = ZeroPadding2D(padding=((1, 1), (1, 1)))(x_3)
-    x_5 = DepthwiseConv2D((5, 5), padding="same")(x)
-    x_5 = BatchNormalization(momentum=Momentum)(x_5)
-    x_5 = ReLU()(x_5)
+    x_8 = Multiscale_Depthwise_Conv_Downsize(x_4, 128)
+    x_8 = Multiscale_Depthwise_Conv(x_8, 128)
+    x_8 = Multiscale_Depthwise_Conv(x_8, 128)
+    x_8 = Multiscale_Depthwise_Conv(x_8, 128)
 
-    x = Concatenate(axis=3)([x_3, x_5])
-    x = Conv2D(out_depth, (1, 1))(x)
-    x = BatchNormalization(momentum=Momentum)(x)
-    x = SpatialDropout2D(Droprate)(x)
+    x_16 = Multiscale_Depthwise_Conv_Downsize(x_8, 128)
+    x_16 = Multiscale_Depthwise_Conv(x_16, 128)
+    x_16 = Multiscale_Depthwise_Conv(x_16, 128)
+    x_16 = Multiscale_Depthwise_Conv(x_16, 128)
+
+    x_2_pool = MaxPooling2D(pool_size=(4, 4))(x_2)
+    x_4_pool = MaxPooling2D(pool_size=(2, 2))(x_4)
+    x_16_pool = UpSampling2D(size=(2, 2))(x_16)
+
+    x = Concatenate(axis=3)([x_2_pool, x_4_pool, x_8, x_16_pool])
+    x = Multiscale_Depthwise_Conv(x, 128)
+    x = Multiscale_Depthwise_Conv(x, 128)
+    x = Multiscale_Depthwise_Conv(x, 128)
+    x = Multiscale_Depthwise_Conv(x, 128)
+
+    x = UpSampling2D(size=(4, 4))(x)
+    x = Multiscale_Depthwise_Conv(x, 32)
+    x = Multiscale_Depthwise_Conv(x, classes)
+
     outputs = Softmax()(x)
-    outputs = UpSampling2D(size=(4, 4))(outputs)
-
-
-    # 128 x 160 x classes
+    outputs = UpSampling2D(size=(2, 2))(outputs)
 
     model = Model(inputs, outputs)
     return model
