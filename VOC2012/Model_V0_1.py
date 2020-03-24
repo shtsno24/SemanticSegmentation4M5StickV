@@ -7,7 +7,7 @@ from tensorflow.keras.layers import LeakyReLU, Add, PReLU, SpatialDropout2D, Zer
 from tensorflow.keras.losses import sparse_categorical_crossentropy
 
 
-def weighted_SparseCategoricalCrossentropy(sample_weights, classes=21):
+def weighted_SparseCategoricalCrossentropy(sample_weights, classes=5):
     def loss_function(y_true, y_pred):
         y_true = tf.cast(y_true, tf.uint8)
         y_true = tf.one_hot(y_true, depth=classes)
@@ -19,7 +19,7 @@ def weighted_SparseCategoricalCrossentropy(sample_weights, classes=21):
     return loss_function
 
 
-def Multiscale_Depthwise_Conv(x, out_depth, internal_scale=4, Momentum=0.1, Droprate=0.01, Alpha=0.1):
+def Multiscale_Depthwise_Conv(x, out_depth, internal_scale=4, Momentum=0.1, Droprate=0.01, Alpha=0.1, Activation_Func=True):
     internal_depth = int(out_depth / internal_scale)
 
     x = Conv2D(internal_depth, (1, 1))(x)
@@ -47,12 +47,13 @@ def Multiscale_Depthwise_Conv(x, out_depth, internal_scale=4, Momentum=0.1, Drop
     x = Conv2D(out_depth, (1, 1))(x)
     x = BatchNormalization(momentum=Momentum)(x)
     x = SpatialDropout2D(Droprate)(x)
-    x = ReLU()(x)
+    if Activation_Func == True:
+        x = ReLU()(x)
 
     return x
 
 
-def Multiscale_Depthwise_Conv_Downsize(x, out_depth, internal_scale=4, Momentum=0.1, Droprate=0.01, Alpha=0.1):
+def Multiscale_Depthwise_Conv_Downsize(x, out_depth, internal_scale=4, Momentum=0.1, Droprate=0.01, Alpha=0.1, Activation_Func=True):
     internal_depth = int(out_depth / internal_scale)
 
     x = Conv2D(internal_depth, (1, 1))(x)
@@ -83,7 +84,7 @@ def Multiscale_Depthwise_Conv_Downsize(x, out_depth, internal_scale=4, Momentum=
     return x
 
 
-def Multiscale_Depthwise_Conv_Upsize(x, out_depth, internal_scale=4, Momentum=0.1, Droprate=0.01, Alpha=0.1):
+def Multiscale_Depthwise_Conv_Upsize(x, out_depth, internal_scale=4, Momentum=0.1, Droprate=0.01, Alpha=0.1, Activation_Func=True):
     internal_depth = int(out_depth / internal_scale)
 
     x = Conv2D(internal_depth, (1, 1))(x)
@@ -180,7 +181,7 @@ def TestNet(input_shape=(128, 160, 3), classes=21):
 """
 
 
-def TestNet(input_shape=(128, 160, 3), classes=21):
+def TestNet(input_shape=(128, 128, 3), classes=5):
     inputs = Input(shape=input_shape)
 
     # x = MaxPooling2D(pool_size=(4, 4))(inputs)
@@ -192,32 +193,47 @@ def TestNet(input_shape=(128, 160, 3), classes=21):
     x_4 = Multiscale_Depthwise_Conv(x_4, 32)
     x_4 = Multiscale_Depthwise_Conv(x_4, 32)
 
-    x_8 = Multiscale_Depthwise_Conv_Downsize(x_4, 128)
-    x_8 = Multiscale_Depthwise_Conv(x_8, 128)
-    x_8 = Multiscale_Depthwise_Conv(x_8, 128)
-    x_8 = Multiscale_Depthwise_Conv(x_8, 128)
+    x_8 = Multiscale_Depthwise_Conv_Downsize(x_4, 64)
+    x_8 = Multiscale_Depthwise_Conv(x_8, 64)
+    x_8 = Multiscale_Depthwise_Conv(x_8, 64)
+    # x_8 = Multiscale_Depthwise_Conv(x_8, 64)
 
-    x_16 = Multiscale_Depthwise_Conv_Downsize(x_8, 128)
-    x_16 = Multiscale_Depthwise_Conv(x_16, 128)
-    x_16 = Multiscale_Depthwise_Conv(x_16, 128)
-    x_16 = Multiscale_Depthwise_Conv(x_16, 128)
+    x_16 = Multiscale_Depthwise_Conv_Downsize(x_8, 64)
+    x_16 = Multiscale_Depthwise_Conv(x_16, 64)
+    x_16 = Multiscale_Depthwise_Conv(x_16, 64)
+    # x_16 = Multiscale_Depthwise_Conv(x_16, 128)
 
-    x_2_pool = MaxPooling2D(pool_size=(4, 4))(x_2)
-    x_4_pool = MaxPooling2D(pool_size=(2, 2))(x_4)
-    x_16_pool = UpSampling2D(size=(2, 2))(x_16)
+    # x_2 = Conv2D(16, (1, 1))(x_2)
+    # x_2 = BatchNormalization(momentum=0.1)(x_2)
+    # x_2 = ReLU()(x_2)
+    # x_2 = MaxPooling2D(pool_size=(2, 2))(x_2)
 
-    x = Concatenate(axis=3)([x_2_pool, x_4_pool, x_8, x_16_pool])
-    x = Multiscale_Depthwise_Conv(x, 128)
-    x = Multiscale_Depthwise_Conv(x, 128)
-    x = Multiscale_Depthwise_Conv(x, 128)
-    x = Multiscale_Depthwise_Conv(x, 128)
+    x_4 = Conv2D(16, (1, 1))(x_4)
+    x_4 = BatchNormalization(momentum=0.1)(x_4)
+    x_4 = ReLU()(x_4)
+    x_4 = UpSampling2D(size=(2, 2))(x_4)
 
-    x = UpSampling2D(size=(4, 4))(x)
+    x_8 = Conv2D(16, (1, 1))(x_8)
+    x_8 = BatchNormalization(momentum=0.1)(x_8)
+    x_8 = ReLU()(x_8)
+    x_8 = UpSampling2D(size=(4, 4))(x_8)
+
+    x_16 = Conv2D(16, (1, 1))(x_16)
+    x_16 = BatchNormalization(momentum=0.1)(x_16)
+    x_16 = ReLU()(x_16)
+    x_16 = UpSampling2D(size=(8, 8))(x_16)
+
+    x = Concatenate(axis=3)([x_2, x_4, x_8, x_16])
     x = Multiscale_Depthwise_Conv(x, 32)
-    x = Multiscale_Depthwise_Conv(x, classes)
+    x = Multiscale_Depthwise_Conv(x, 16)
+
+    x = UpSampling2D(size=(2, 2))(x)
+    x = Multiscale_Depthwise_Conv(x, classes, Activation_Func=False)
 
     outputs = Softmax()(x)
-    outputs = UpSampling2D(size=(2, 2))(outputs)
+    # outputs = UpSampling2D(size=(2, 2), interpolation='bilinear')(outputs)
 
     model = Model(inputs, outputs)
     return model
+
+    # 2097152 B

@@ -9,10 +9,10 @@ try:
     # MODEL_TFLITE = "model_viewer.tflite"
     MODEL_FILE = "Model_V0_1.h5"
     MODEL_TFLITE = "Model_V0_1.tflite"
-    LABELS = 21
+    LABELS = 5
     COLOR_DEPTH = 3
     CROP_HEIGHT = 128  # sensor.LCD[128, 160]
-    CROP_WIDTH = 160
+    CROP_WIDTH = 128
 
     with tf.device('/cpu:0'):
         # Load model

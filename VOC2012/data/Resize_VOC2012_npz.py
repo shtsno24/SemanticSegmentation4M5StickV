@@ -11,9 +11,9 @@ from tensorflow.python.client import device_lib
 try:
     print(device_lib.list_local_devices())
 
-    CROP_HEIGHT = 128
-    CROP_WIDTH = 160
-    LABELS = 21
+    RESIZE_HEIGHT = 128
+    RESIZE_WIDTH = 128
+    LABELS = 5  # With BackGround
     COLOR_DEPTH = 3
     SAMPLE = np.random.randint(30)
 
@@ -59,12 +59,33 @@ try:
                     annotation_data = np.array(annotation_object, dtype=np.uint8)
                     annotation_data = annotation_data.reshape(annotation_data.shape + (1,))
                     annotation_data[annotation_data == 255] = 0
-                    hist, bin = np.histogram(annotation_data, bins=np.arange(LABELS + 1))
+                    # Reduce index. refer to https://qiita.com/mine820/items/725fe55c095f28bffe87
+                    for ic in [1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 13, 14, 17, 19]:
+                        annotation_data[annotation_data == ic] = 4
+
+                    # 0:BG 9:CHAIR 11:TABLE(Same as CHAIR and SOFA) 15:PEOPLE 18:SOFA(Same as CHAIR and TABLE) 20:TV 21:VOID
+                    # 0:BG 1:CHAIR,TABLE,SOFA 2:PEOPLE 3:TV 4:VOID
+                    # annotation_data[annotation_data == 5] = 1
+                    annotation_data[annotation_data == 9] = 1
+                    annotation_data[annotation_data == 11] = 1
+                    annotation_data[annotation_data == 15] = 2
+                    annotation_data[annotation_data == 18] = 1
+                    annotation_data[annotation_data == 20] = 3
+
+                    hist, bins = np.histogram(annotation_data, bins=np.arange(LABELS + 1))
                     label_balance_array += hist
                     pixel_cnt = annotation_data.shape[0] * annotation_data.shape[1] * annotation_data.shape[2]
                     label_pixel_count_array[hist > 0] += pixel_cnt
                     if i == 0:
-                        palette = np.array(annotation_object.getpalette(), dtype=np.uint8).reshape(-1, 3)
+                        palette_raw = np.array(annotation_object.getpalette(), dtype=np.uint8).reshape(-1, 3)
+
+                        for index, ic in enumerate([0, 9, 15, 20, 255]):
+                            palette_raw[index][0] = palette_raw[ic][0]
+                            palette_raw[index][1] = palette_raw[ic][1]
+                            palette_raw[index][2] = palette_raw[ic][2]
+
+                        palette = np.copy(palette_raw)
+                        # print(palette.shape)
 
                 # Resizeing data
                 X, Y = image_data.shape[0], image_data.shape[1]
@@ -73,9 +94,9 @@ try:
                 else:
                     long_side = X
                 annotation_data = tf.image.resize_with_crop_or_pad(annotation_data, long_side, long_side)
-                annotation_data = tf.image.resize(annotation_data, (CROP_HEIGHT, CROP_WIDTH), method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
+                annotation_data = tf.image.resize(annotation_data, (RESIZE_HEIGHT, RESIZE_WIDTH), method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
                 image_data = tf.image.resize_with_crop_or_pad(image_data, long_side, long_side)
-                image_data = tf.image.resize(image_data, (CROP_HEIGHT, CROP_WIDTH), method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
+                image_data = tf.image.resize(image_data, (RESIZE_HEIGHT, RESIZE_WIDTH), method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
 
                 # Reshape annotation_data
                 annotation_data = tf.reshape(annotation_data, annotation_data.shape[:2])
@@ -83,7 +104,7 @@ try:
                 image_array = image_data.numpy()
 
                 # Get pixel frequency
-                hist, bin = np.histogram(annotation_array, bins=np.arange(LABELS + 1))
+                hist, bins = np.histogram(annotation_array, bins=np.arange(LABELS + 1))
                 label_balance_array_resize += hist
                 pixel_cnt = annotation_array.shape[0] * annotation_array.shape[1]
                 label_pixel_count_array_resize[hist > 0] += pixel_cnt
@@ -118,7 +139,7 @@ try:
                 label_pix=label_balance_array,
                 label_pix_cnt=label_pixel_count_array,
                 label_pix_cnt_resize=label_pixel_count_array_resize)
-        print("Labels               :", bin)
+        print("Labels               :", bins)
         print("Pixels in each label :", label_balance_array)
         print("Pixels in each label(with resized images) :", label_balance_array_resize)
         label_balance_array = np.zeros(LABELS)
@@ -157,12 +178,32 @@ try:
                     annotation_data = np.array(annotation_object, dtype=np.uint8)
                     annotation_data = annotation_data.reshape(annotation_data.shape + (1,))
                     annotation_data[annotation_data == 255] = 0
-                    hist, bin = np.histogram(annotation_data, bins=np.arange(LABELS + 1))
+                    # Reduce index. refer to https://qiita.com/mine820/items/725fe55c095f28bffe87
+                    for ic in [1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 13, 14, 17, 19]:
+                        annotation_data[annotation_data == ic] = 4
+
+                    # 0:BG 9:CHAIR 11:TABLE(Same as CHAIR and SOFA) 15:PEOPLE 18:SOFA(Same as CHAIR and TABLE) 20:TV 21:VOID
+                    # 0:BG 1:CHAIR,TABLE,SOFA 2:PEOPLE 3:TV 4:VOID
+                    # annotation_data[annotation_data == 5] = 1
+                    annotation_data[annotation_data == 9] = 1
+                    annotation_data[annotation_data == 11] = 1
+                    annotation_data[annotation_data == 15] = 2
+                    annotation_data[annotation_data == 18] = 1
+                    annotation_data[annotation_data == 20] = 3
+
+                    hist, bins = np.histogram(annotation_data, bins=np.arange(LABELS + 1))
                     label_balance_array += hist
                     pixel_cnt = annotation_data.shape[0] * annotation_data.shape[1] * annotation_data.shape[2]
                     label_pixel_count_array[hist > 0] += pixel_cnt
                     if i == 0:
-                        palette = np.array(annotation_object.getpalette(), dtype=np.uint8).reshape(-1, 3)
+                        palette_raw = np.array(annotation_object.getpalette(), dtype=np.uint8).reshape(-1, 3)
+
+                        for index, ic in enumerate([0, 9, 15, 20, 255]):
+                            palette_raw[index][0] = palette_raw[ic][0]
+                            palette_raw[index][1] = palette_raw[ic][1]
+                            palette_raw[index][2] = palette_raw[ic][2]
+
+                        palette = np.copy(palette_raw)
 
                 # Resizeing data
                 X, Y = image_data.shape[0], image_data.shape[1]
@@ -171,9 +212,9 @@ try:
                 else:
                     long_side = X
                 annotation_data = tf.image.resize_with_crop_or_pad(annotation_data, long_side, long_side)
-                annotation_data = tf.image.resize(annotation_data, (CROP_HEIGHT, CROP_WIDTH), method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
+                annotation_data = tf.image.resize(annotation_data, (RESIZE_HEIGHT, RESIZE_WIDTH), method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
                 image_data = tf.image.resize_with_crop_or_pad(image_data, long_side, long_side)
-                image_data = tf.image.resize(image_data, (CROP_HEIGHT, CROP_WIDTH), method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
+                image_data = tf.image.resize(image_data, (RESIZE_HEIGHT, RESIZE_WIDTH), method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
 
                 # Reshape annotation_data
                 annotation_data = tf.reshape(annotation_data, annotation_data.shape[:2])
@@ -181,7 +222,7 @@ try:
                 image_array = image_data.numpy()
 
                 # Get pixel frequency
-                hist, bin = np.histogram(annotation_array, bins=np.arange(LABELS + 1))
+                hist, bins = np.histogram(annotation_array, bins=np.arange(LABELS + 1))
                 label_balance_array_resize += hist
                 pixel_cnt += annotation_array.shape[0] * annotation_array.shape[1]
                 label_pixel_count_array_resize[hist > 0] += pixel_cnt
@@ -216,7 +257,7 @@ try:
                 label_pix=label_balance_array,
                 label_pix_cnt=label_pixel_count_array,
                 label_pix_cnt_resize=label_pixel_count_array_resize)
-        print("Labels               :", bin)
+        print("Labels               :", bins)
         print("Pixels in each label :", label_balance_array)
         print("Pixels in each label(with resized images) :", label_balance_array)
         label_balance_array = np.zeros(LABELS)
@@ -255,12 +296,32 @@ try:
                     annotation_data = np.array(annotation_object, dtype=np.uint8)
                     annotation_data = annotation_data.reshape(annotation_data.shape + (1,))
                     annotation_data[annotation_data == 255] = 0
-                    hist, bin = np.histogram(annotation_data, bins=np.arange(LABELS + 1))
+                    # Reduce index. refer to https://qiita.com/mine820/items/725fe55c095f28bffe87
+                    for ic in [1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 13, 14, 17, 19]:
+                        annotation_data[annotation_data == ic] = 4
+
+                    # 0:BG 9:CHAIR 11:TABLE(Same as CHAIR and SOFA) 15:PEOPLE 18:SOFA(Same as CHAIR and TABLE) 20:TV 21:VOID
+                    # 0:BG 1:CHAIR,TABLE,SOFA 2:PEOPLE 3:TV 4:VOID
+                    # annotation_data[annotation_data == 5] = 1
+                    annotation_data[annotation_data == 9] = 1
+                    annotation_data[annotation_data == 11] = 1
+                    annotation_data[annotation_data == 15] = 2
+                    annotation_data[annotation_data == 18] = 1
+                    annotation_data[annotation_data == 20] = 3
+
+                    hist, bins = np.histogram(annotation_data, bins=np.arange(LABELS + 1))
                     label_balance_array += hist
                     pixel_cnt = annotation_data.shape[0] * annotation_data.shape[1] * annotation_data.shape[2]
                     label_pixel_count_array[hist > 0] += pixel_cnt
                     if i == 0:
-                        palette = np.array(annotation_object.getpalette(), dtype=np.uint8).reshape(-1, 3)
+                        palette_raw = np.array(annotation_object.getpalette(), dtype=np.uint8).reshape(-1, 3)
+
+                        for index, ic in enumerate([0, 9, 15, 20, 255]):
+                            palette_raw[index][0] = palette_raw[ic][0]
+                            palette_raw[index][1] = palette_raw[ic][1]
+                            palette_raw[index][2] = palette_raw[ic][2]
+
+                        palette = np.copy(palette_raw)
 
                 # Resizeing data
                 X, Y = image_data.shape[0], image_data.shape[1]
@@ -269,9 +330,9 @@ try:
                 else:
                     long_side = X
                 annotation_data = tf.image.resize_with_crop_or_pad(annotation_data, long_side, long_side)
-                annotation_data = tf.image.resize(annotation_data, (CROP_HEIGHT, CROP_WIDTH), method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
+                annotation_data = tf.image.resize(annotation_data, (RESIZE_HEIGHT, RESIZE_WIDTH), method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
                 image_data = tf.image.resize_with_crop_or_pad(image_data, long_side, long_side)
-                image_data = tf.image.resize(image_data, (CROP_HEIGHT, CROP_WIDTH), method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
+                image_data = tf.image.resize(image_data, (RESIZE_HEIGHT, RESIZE_WIDTH), method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
 
                 # Reshape annotation_data
                 annotation_data = tf.reshape(annotation_data, annotation_data.shape[:2])
@@ -279,7 +340,7 @@ try:
                 image_array = image_data.numpy()
 
                 # Get pixel frequency
-                hist, bin = np.histogram(annotation_array, bins=np.arange(LABELS + 1))
+                hist, bins = np.histogram(annotation_array, bins=np.arange(LABELS + 1))
                 label_balance_array_resize += hist
                 pixel_cnt += annotation_array.shape[0] * annotation_array.shape[1]
                 label_pixel_count_array_resize[hist > 0] += pixel_cnt
@@ -314,7 +375,7 @@ try:
                 label_pix=label_balance_array,
                 label_pix_cnt=label_pixel_count_array,
                 label_pix_cnt_resize=label_pixel_count_array_resize)
-        print("Labels               :", bin)
+        print("Labels               :", bins)
         print("Pixels in each label :", label_balance_array)
         print("Pixels in each label(with resized images) :", label_balance_array)
         label_balance_array = np.zeros(LABELS)

@@ -17,6 +17,8 @@ VOC2012/data/SegmentationClass
 VOC2012/data/SegmentationObject
 VOC2012/data/*.tfrecords
 model_viewer.py
+VOC2012/ncc
+VOC2012/compile_kmodel.sh
 # keras_conv2d_test.py
 # keras_conv2d_test.h5
 # keras_conv2d_test.tflite
