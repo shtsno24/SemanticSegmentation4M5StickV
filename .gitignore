@@ -3,6 +3,7 @@ __pycache__
 *.npz
 *.zip
 *.tar
+scene_parse150/data
 scene_parse150/data/color150
 scene_parse150/data/ADEChallengeData2016
 scene_parse150/data/*.tfrecords
