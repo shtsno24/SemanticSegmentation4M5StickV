@@ -3,6 +3,7 @@ __pycache__
 *.npz
 *.zip
 *.tar
+*.dot
 
 scene_parse150/data
 scene_parse150
