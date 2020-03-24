@@ -149,8 +149,8 @@ def bottleneck_dilated(x, dilated, output_depth, internal_scale=4, Momentum=0.1)
     x_conv = BatchNormalization(momentum=Momentum)(x_conv)
     x_conv = Activation("relu")(x_conv)
 
-    x_conv = ZeroPadding2D(padding=((dilated, dilated), (dilated, dilated)))(x_conv)
-    x_conv = DepthwiseConv2D((3, 3), dilation_rate=(dilated, dilated))(x_conv)
+    # x_conv = ZeroPadding2D(padding=((dilated, dilated), (dilated, dilated)))(x_conv) <- can't convert to tflite
+    x_conv = DepthwiseConv2D((3, 3), dilation_rate=(dilated, dilated), padding="same")(x_conv)
     x_conv = BatchNormalization(momentum=Momentum)(x_conv)
     x_conv = Activation("relu")(x_conv)
     x_conv = Conv2D(internal_depth, (1, 1))(x_conv)
