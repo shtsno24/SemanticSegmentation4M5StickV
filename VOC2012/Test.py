@@ -31,8 +31,27 @@ try:
         annotation_data = np.array(annotation_object, dtype=np.uint8)
         annotation_data = annotation_data.reshape(annotation_data.shape + (1,))
         annotation_data[annotation_data == 255] = 0
+        # Reduce index. refer to https://qiita.com/mine820/items/725fe55c095f28bffe87
+        for ic in [1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 13, 14, 16, 17, 19]:
+            annotation_data[annotation_data == ic] = 0
+
+        # 0:BG 9:CHAIR 11:TABLE 15:PEOPLE 18:SOFA(Same as CHAIR) 20:TV 21:VOID
+        # 0:BG,VOID 1:CHAIR,TABLE,SOFA 2:PEOPLE 3:TV 4:VOID
+        # annotation_data[annotation_data == 5] = 1
+        annotation_data[annotation_data == 9] = 1
+        annotation_data[annotation_data == 11] = 2
+        annotation_data[annotation_data == 15] = 3
+        annotation_data[annotation_data == 18] = 1
+        annotation_data[annotation_data == 20] = 4
+
+
         palette = np.array(annotation_object.getpalette(), dtype=np.uint8).reshape(-1, 3)
         palette[21] = 255
+        for index, ic in enumerate([0, 9, 11, 15, 20]):
+            palette[index][0] = palette[ic][0]
+            palette[index][1] = palette[ic][1]
+            palette[index][2] = palette[ic][2]
+
     with Image.open(TEST_IMAGE) as image_object:
         image_object = image_object.convert("RGB")
 

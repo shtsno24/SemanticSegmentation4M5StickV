@@ -35,13 +35,14 @@ def initial_block(x, input_depth, channel, stride=(2, 2), Momentum=0.1):
     x_conv_5 = Conv2D(internal_channel, (1, 1))(x_conv_5)
     x_conv_5 = Activation("relu")(x_conv_5)
 
-    x_conv_7 = ZeroPadding2D(padding=((1, 1), (1, 1)))(x_conv_5)
-    x_conv_7 = DepthwiseConv2D((3, 3))(x_conv_7)
-    x_conv_7 = Activation("relu")(x_conv_7)
-    x_conv_7 = Conv2D(internal_channel, (1, 1))(x_conv_7)
-    x_conv_7 = Activation("relu")(x_conv_7)
+    # x_conv_7 = ZeroPadding2D(padding=((1, 1), (1, 1)))(x_conv_5)
+    # x_conv_7 = DepthwiseConv2D((3, 3))(x_conv_7)
+    # x_conv_7 = Activation("relu")(x_conv_7)
+    # x_conv_7 = Conv2D(internal_channel, (1, 1))(x_conv_7)
+    # x_conv_7 = Activation("relu")(x_conv_7)
 
-    x_conv = Concatenate(axis=3)([x_conv_3, x_conv_5, x_conv_7])
+    # x_conv = Concatenate(axis=3)([x_conv_3, x_conv_5, x_conv_7])
+    x_conv = Concatenate(axis=3)([x_conv_3, x_conv_5])
     x_conv = MaxPooling2D(pool_size=(2, 2))(x_conv)
 
     x_pool = MaxPooling2D(pool_size=(2, 2))(x)
@@ -51,6 +52,36 @@ def initial_block(x, input_depth, channel, stride=(2, 2), Momentum=0.1):
     y = BatchNormalization(momentum=Momentum)(y)
     y = Activation("relu")(y)
 
+    return y
+
+
+def bottleneck(x, output_depth, internal_scale=4, Momentum=0.1):
+    internal_depth = int(output_depth / internal_scale)
+
+    x_conv = Conv2D(internal_depth, (1, 1))(x)
+    x_conv = BatchNormalization(momentum=Momentum)(x_conv)
+    x_conv = Activation("relu")(x_conv)
+
+    for _ in range(2):
+        x_conv = ZeroPadding2D(padding=((1, 1), (1, 1)))(x_conv)
+        x_conv = DepthwiseConv2D((3, 3))(x_conv)
+        x_conv = BatchNormalization(momentum=Momentum)(x_conv)
+        x_conv = Activation("relu")(x_conv)
+        x_conv = Conv2D(internal_depth, (1, 1))(x_conv)
+        x_conv = BatchNormalization(momentum=Momentum)(x_conv)
+        x_conv = Activation("relu")(x_conv)
+
+    x_conv = Conv2D(output_depth, (1, 1), use_bias=False)(x_conv)
+    x_conv = BatchNormalization(momentum=Momentum)(x_conv)
+    x_conv = SpatialDropout2D(0.01)(x_conv)
+
+    x_pool = MaxPooling2D(pool_size=(2, 2))(x)
+    x_pool = UpSampling2D(size=(2, 2))(x_pool)
+
+    x = Concatenate()([x_conv, x_pool])
+    x = Conv2D(output_depth, (1, 1))(x)
+    x = BatchNormalization(momentum=Momentum)(x)
+    y = Activation("relu")(x)
     return y
 
 
@@ -64,13 +95,14 @@ def bottleneck_downsample(x, output_depth, internal_scale=4, Momentum=0.1):
     x_conv = BatchNormalization(momentum=Momentum)(x_conv)
     x_conv = Activation("relu")(x_conv)
 
-    x_conv = ZeroPadding2D(padding=((1, 1), (1, 1)))(x_conv)
-    x_conv = DepthwiseConv2D((3, 3))(x_conv)
-    x_conv = BatchNormalization(momentum=Momentum)(x_conv)
-    x_conv = Activation("relu")(x_conv)
-    x_conv = Conv2D(internal_depth, (1, 1))(x_conv)
-    x_conv = BatchNormalization(momentum=Momentum)(x_conv)
-    x_conv = Activation("relu")(x_conv)
+    for _ in range(2):
+        x_conv = ZeroPadding2D(padding=((1, 1), (1, 1)))(x_conv)
+        x_conv = DepthwiseConv2D((3, 3))(x_conv)
+        x_conv = BatchNormalization(momentum=Momentum)(x_conv)
+        x_conv = Activation("relu")(x_conv)
+        x_conv = Conv2D(internal_depth, (1, 1))(x_conv)
+        x_conv = BatchNormalization(momentum=Momentum)(x_conv)
+        x_conv = Activation("relu")(x_conv)
 
     x_conv = Conv2D(output_depth, (1, 1), use_bias=False)(x_conv)
     x_conv = BatchNormalization(momentum=Momentum)(x_conv)
@@ -79,35 +111,6 @@ def bottleneck_downsample(x, output_depth, internal_scale=4, Momentum=0.1):
     x_pool = MaxPooling2D(pool_size=(2, 2))(x)
 
     x = Concatenate(axis=3)([x_conv, x_pool])
-    x = Conv2D(output_depth, (1, 1))(x)
-    x = BatchNormalization(momentum=Momentum)(x)
-    y = Activation("relu")(x)
-    return y
-
-
-def bottleneck(x, output_depth, internal_scale=4, Momentum=0.1):
-    internal_depth = int(output_depth / internal_scale)
-
-    x_conv = Conv2D(internal_depth, (1, 1))(x)
-    x_conv = BatchNormalization(momentum=Momentum)(x_conv)
-    x_conv = Activation("relu")(x_conv)
-
-    x_conv = ZeroPadding2D(padding=((1, 1), (1, 1)))(x_conv)
-    x_conv = DepthwiseConv2D((3, 3))(x_conv)
-    x_conv = BatchNormalization(momentum=Momentum)(x_conv)
-    x_conv = Activation("relu")(x_conv)
-    x_conv = Conv2D(internal_depth, (1, 1))(x_conv)
-    x_conv = BatchNormalization(momentum=Momentum)(x_conv)
-    x_conv = Activation("relu")(x_conv)
-
-    x_conv = Conv2D(output_depth, (1, 1), use_bias=False)(x_conv)
-    x_conv = BatchNormalization(momentum=Momentum)(x_conv)
-    x_conv = SpatialDropout2D(0.01)(x_conv)
-
-    x_pool = MaxPooling2D(pool_size=(2, 2))(x)
-    x_pool = UpSampling2D(size=(2, 2))(x_pool)
-
-    x = Concatenate()([x_conv, x_pool])
     x = Conv2D(output_depth, (1, 1))(x)
     x = BatchNormalization(momentum=Momentum)(x)
     y = Activation("relu")(x)
@@ -149,17 +152,18 @@ def bottleneck_dilated(x, dilated, output_depth, internal_scale=4, Momentum=0.1)
     x_conv = BatchNormalization(momentum=Momentum)(x_conv)
     x_conv = Activation("relu")(x_conv)
 
-    # x_conv = ZeroPadding2D(padding=((dilated, dilated), (dilated, dilated)))(x_conv) <- can't convert to tflite
-    x_conv = DepthwiseConv2D((3, 3), dilation_rate=(dilated, dilated), padding="same")(x_conv)
-    x_conv = BatchNormalization(momentum=Momentum)(x_conv)
-    x_conv = Activation("relu")(x_conv)
-    x_conv = Conv2D(internal_depth, (1, 1))(x_conv)
-    x_conv = BatchNormalization(momentum=Momentum)(x_conv)
-    x_conv = Activation("relu")(x_conv)
-    # dilation_rate = 2 : padding = 2
-    # dilation_rate = 4 : padding = 4
-    # dilation_rate = 8 : padding = 8
-    # dilation_rate = 16: padding = 16
+    for _ in range(2):
+        # x_conv = ZeroPadding2D(padding=((dilated, dilated), (dilated, dilated)))(x_conv) <- can't convert to tflite
+        x_conv = DepthwiseConv2D((3, 3), dilation_rate=(dilated, dilated), padding="same")(x_conv)
+        x_conv = BatchNormalization(momentum=Momentum)(x_conv)
+        x_conv = Activation("relu")(x_conv)
+        x_conv = Conv2D(internal_depth, (1, 1))(x_conv)
+        x_conv = BatchNormalization(momentum=Momentum)(x_conv)
+        x_conv = Activation("relu")(x_conv)
+        # dilation_rate = 2 : padding = 2
+        # dilation_rate = 4 : padding = 4
+        # dilation_rate = 8 : padding = 8
+        # dilation_rate = 16: padding = 16
 
     x_conv = Conv2D(output_depth, (1, 1), use_bias=False)(x_conv)
     x_conv = BatchNormalization(momentum=Momentum)(x_conv)

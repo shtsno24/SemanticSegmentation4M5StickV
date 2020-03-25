@@ -60,17 +60,17 @@ try:
                     annotation_data = annotation_data.reshape(annotation_data.shape + (1,))
                     annotation_data[annotation_data == 255] = 0
                     # Reduce index. refer to https://qiita.com/mine820/items/725fe55c095f28bffe87
-                    for ic in [1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 13, 14, 17, 19]:
-                        annotation_data[annotation_data == ic] = 4
+                    for ic in [1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 13, 14, 16, 17, 19]:
+                        annotation_data[annotation_data == ic] = 0
 
-                    # 0:BG 9:CHAIR 11:TABLE(Same as CHAIR and SOFA) 15:PEOPLE 18:SOFA(Same as CHAIR and TABLE) 20:TV 21:VOID
-                    # 0:BG 1:CHAIR,TABLE,SOFA 2:PEOPLE 3:TV 4:VOID
+                    # 0:BG 9:CHAIR 11:TABLE 15:PEOPLE 18:SOFA(Same as CHAIR) 20:TV 21:VOID
+                    # 0:BG,VOID 1:CHAIR,TABLE,SOFA 2:PEOPLE 3:TV 4:VOID
                     # annotation_data[annotation_data == 5] = 1
                     annotation_data[annotation_data == 9] = 1
-                    annotation_data[annotation_data == 11] = 1
-                    annotation_data[annotation_data == 15] = 2
+                    annotation_data[annotation_data == 11] = 2
+                    annotation_data[annotation_data == 15] = 3
                     annotation_data[annotation_data == 18] = 1
-                    annotation_data[annotation_data == 20] = 3
+                    annotation_data[annotation_data == 20] = 4
 
                     hist, bins = np.histogram(annotation_data, bins=np.arange(LABELS + 1))
                     label_balance_array += hist
@@ -79,7 +79,7 @@ try:
                     if i == 0:
                         palette_raw = np.array(annotation_object.getpalette(), dtype=np.uint8).reshape(-1, 3)
 
-                        for index, ic in enumerate([0, 9, 15, 20, 255]):
+                        for index, ic in enumerate([0, 9, 11, 15, 20]):
                             palette_raw[index][0] = palette_raw[ic][0]
                             palette_raw[index][1] = palette_raw[ic][1]
                             palette_raw[index][2] = palette_raw[ic][2]
@@ -179,17 +179,17 @@ try:
                     annotation_data = annotation_data.reshape(annotation_data.shape + (1,))
                     annotation_data[annotation_data == 255] = 0
                     # Reduce index. refer to https://qiita.com/mine820/items/725fe55c095f28bffe87
-                    for ic in [1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 13, 14, 17, 19]:
-                        annotation_data[annotation_data == ic] = 4
+                    for ic in [1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 13, 14, 16, 17, 19]:
+                        annotation_data[annotation_data == ic] = 0
 
-                    # 0:BG 9:CHAIR 11:TABLE(Same as CHAIR and SOFA) 15:PEOPLE 18:SOFA(Same as CHAIR and TABLE) 20:TV 21:VOID
-                    # 0:BG 1:CHAIR,TABLE,SOFA 2:PEOPLE 3:TV 4:VOID
+                    # 0:BG 9:CHAIR 11:TABLE 15:PEOPLE 18:SOFA(Same as CHAIR) 20:TV 21:VOID
+                    # 0:BG,VOID 1:CHAIR,TABLE,SOFA 2:PEOPLE 3:TV 4:VOID
                     # annotation_data[annotation_data == 5] = 1
                     annotation_data[annotation_data == 9] = 1
-                    annotation_data[annotation_data == 11] = 1
-                    annotation_data[annotation_data == 15] = 2
+                    annotation_data[annotation_data == 11] = 2
+                    annotation_data[annotation_data == 15] = 3
                     annotation_data[annotation_data == 18] = 1
-                    annotation_data[annotation_data == 20] = 3
+                    annotation_data[annotation_data == 20] = 4
 
                     hist, bins = np.histogram(annotation_data, bins=np.arange(LABELS + 1))
                     label_balance_array += hist
@@ -198,7 +198,7 @@ try:
                     if i == 0:
                         palette_raw = np.array(annotation_object.getpalette(), dtype=np.uint8).reshape(-1, 3)
 
-                        for index, ic in enumerate([0, 9, 15, 20, 255]):
+                        for index, ic in enumerate([0, 9, 11, 15, 20]):
                             palette_raw[index][0] = palette_raw[ic][0]
                             palette_raw[index][1] = palette_raw[ic][1]
                             palette_raw[index][2] = palette_raw[ic][2]
@@ -297,17 +297,17 @@ try:
                     annotation_data = annotation_data.reshape(annotation_data.shape + (1,))
                     annotation_data[annotation_data == 255] = 0
                     # Reduce index. refer to https://qiita.com/mine820/items/725fe55c095f28bffe87
-                    for ic in [1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 13, 14, 17, 19]:
-                        annotation_data[annotation_data == ic] = 4
+                    for ic in [1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 13, 14, 16, 17, 19]:
+                        annotation_data[annotation_data == ic] = 0
 
-                    # 0:BG 9:CHAIR 11:TABLE(Same as CHAIR and SOFA) 15:PEOPLE 18:SOFA(Same as CHAIR and TABLE) 20:TV 21:VOID
-                    # 0:BG 1:CHAIR,TABLE,SOFA 2:PEOPLE 3:TV 4:VOID
+                    # 0:BG 9:CHAIR 11:TABLE 15:PEOPLE 18:SOFA(Same as CHAIR) 20:TV 21:VOID
+                    # 0:BG,VOID 1:CHAIR,TABLE,SOFA 2:PEOPLE 3:TV 4:VOID
                     # annotation_data[annotation_data == 5] = 1
                     annotation_data[annotation_data == 9] = 1
-                    annotation_data[annotation_data == 11] = 1
-                    annotation_data[annotation_data == 15] = 2
+                    annotation_data[annotation_data == 11] = 2
+                    annotation_data[annotation_data == 15] = 3
                     annotation_data[annotation_data == 18] = 1
-                    annotation_data[annotation_data == 20] = 3
+                    annotation_data[annotation_data == 20] = 4
 
                     hist, bins = np.histogram(annotation_data, bins=np.arange(LABELS + 1))
                     label_balance_array += hist
@@ -316,7 +316,7 @@ try:
                     if i == 0:
                         palette_raw = np.array(annotation_object.getpalette(), dtype=np.uint8).reshape(-1, 3)
 
-                        for index, ic in enumerate([0, 9, 15, 20, 255]):
+                        for index, ic in enumerate([0, 9, 11, 15, 20]):
                             palette_raw[index][0] = palette_raw[ic][0]
                             palette_raw[index][1] = palette_raw[ic][1]
                             palette_raw[index][2] = palette_raw[ic][2]
