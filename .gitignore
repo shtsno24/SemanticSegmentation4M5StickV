@@ -4,6 +4,7 @@ __pycache__
 *.zip
 *.tar
 *.dot
+*.pdf
 
 scene_parse150/data
 scene_parse150

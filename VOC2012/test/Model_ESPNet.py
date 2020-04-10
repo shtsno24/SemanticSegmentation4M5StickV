@@ -90,12 +90,16 @@ def ESP_Module_DownSampling(x, out_depth, internal_depth_ratio=4, Momentum=0.01,
 
 def encoder(x, classes=5):
 
+    pool_1 = MaxPooling2D(pool_size=(2, 2))(x)
+    pool_2 = MaxPooling2D(pool_size=(4, 4))(x)
+
     # 128 x 128 x 3
     x = ZeroPadding2D(padding=1)(x)
     x = DepthwiseConv2D((3, 3), stride=(2, 2))(x)
     x = Conv2D(16, (1, 1))(x)
     x = BatchNormalization(momentum=0.01)(x)
     x = LeakyReLU(alpha=0.3)(x)
+    x = Concatenate(axsi=3)(x, pool_1)
     x_0 = x
     # 64 x 64 x 16
 
@@ -106,6 +110,7 @@ def encoder(x, classes=5):
     x = Concatenate(axis=3)([x, x_skip])
     x = BatchNormalization(momentum=0.01)(x)
     x = LeakyReLU(alpha=0.3)(x)
+    x = Concatenate(axsi=3)(x, pool_2)
     x_1 = x
     # 32 x 32 x 128
 
