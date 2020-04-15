@@ -69,7 +69,7 @@ try:
 
     # Load model
     print("Load Model...\n\n")
-    model = Model.TestNet(input_shape=(128, 128, 3))
+    model = Model.TestNet(input_shape=(CROP_HEIGHT, CROP_WIDTH, 3))
     model.summary()
     print("\nDone")
 

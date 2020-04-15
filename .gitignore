@@ -21,7 +21,7 @@ VOC2012/data/*.tfrecords
 model_viewer.py
 VOC2012/ncc
 VOC2012/compile_kmodel.sh
-VOC2012/Start_TF_Docker.sh
+Start_TF_Docker.sh
 VOC2012/get-pip.py
 # keras_conv2d_test.py
 # keras_conv2d_test.h5
