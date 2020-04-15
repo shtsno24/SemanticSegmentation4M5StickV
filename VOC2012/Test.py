@@ -22,8 +22,8 @@ try:
     MODEL_FILE = "Model_V0_1.h5"
     LABELS = 5
     COLOR_DEPTH = 3
-    CROP_HEIGHT = 128  # sensor.LCD[128, 160]
-    CROP_WIDTH = 128
+    CROP_HEIGHT = 64  # sensor.LCD[64, 64]
+    CROP_WIDTH = 64
 
     # Load data
     print("\n\nLoad data...\n")
@@ -43,7 +43,6 @@ try:
         annotation_data[annotation_data == 15] = 3
         annotation_data[annotation_data == 18] = 1
         annotation_data[annotation_data == 20] = 4
-
 
         palette = np.array(annotation_object.getpalette(), dtype=np.uint8).reshape(-1, 3)
         palette[21] = 255

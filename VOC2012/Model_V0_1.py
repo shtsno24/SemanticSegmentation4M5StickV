@@ -203,7 +203,7 @@ def bottleneck_upsampling(x, output_depth, internal_scale=4, Momentum=0.1):
     return y
 
 
-def TestNet(input_shape=(128, 128, 3), classes=5):
+def TestNet(input_shape=(64, 64, 3), classes=5):
 
     inputs = Input(shape=input_shape)
     x = initial_block(inputs, 4, 16)

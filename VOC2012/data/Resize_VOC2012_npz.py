@@ -11,8 +11,10 @@ from tensorflow.python.client import device_lib
 try:
     print(device_lib.list_local_devices())
 
-    RESIZE_HEIGHT = 128
-    RESIZE_WIDTH = 128
+    # RESIZE_HEIGHT = 128
+    # RESIZE_WIDTH = 128
+    RESIZE_HEIGHT = 64
+    RESIZE_WIDTH = 64
     LABELS = 5  # With BackGround
     COLOR_DEPTH = 3
     SAMPLE = np.random.randint(30)
@@ -64,7 +66,7 @@ try:
                         annotation_data[annotation_data == ic] = 0
 
                     # 0:BG 9:CHAIR 11:TABLE 15:PEOPLE 18:SOFA(Same as CHAIR) 20:TV 21:VOID
-                    # 0:BG,VOID 1:CHAIR,TABLE,SOFA 2:PEOPLE 3:TV 4:VOID
+                    # 0:BG,VOID 1:CHAIR,SOFA 2:TABLE 3:PEOPLE 4:TV
                     # annotation_data[annotation_data == 5] = 1
                     annotation_data[annotation_data == 9] = 1
                     annotation_data[annotation_data == 11] = 2
@@ -133,12 +135,12 @@ try:
         annotation_data = np.array(annotation_array_list, dtype=np.uint8)
         image_data = np.array(image_array_list, dtype=np.uint8)
         np.savez(TRAIN_RECORDS,
-                image=image_data,
-                annotation=annotation_data,
-                label_pix_resize=label_balance_array_resize,
-                label_pix=label_balance_array,
-                label_pix_cnt=label_pixel_count_array,
-                label_pix_cnt_resize=label_pixel_count_array_resize)
+                 image=image_data,
+                 annotation=annotation_data,
+                 label_pix_resize=label_balance_array_resize,
+                 label_pix=label_balance_array,
+                 label_pix_cnt=label_pixel_count_array,
+                 label_pix_cnt_resize=label_pixel_count_array_resize)
         print("Labels               :", bins)
         print("Pixels in each label :", label_balance_array)
         print("Pixels in each label(with resized images) :", label_balance_array_resize)
@@ -251,12 +253,12 @@ try:
         annotation_data = np.array(annotation_array_list, dtype=np.uint8)
         image_data = np.array(image_array_list, dtype=np.uint8)
         np.savez(TRAINVAL_RECORDS,
-                image=image_data,
-                annotation=annotation_data,
-                label_pix_resize=label_balance_array_resize,
-                label_pix=label_balance_array,
-                label_pix_cnt=label_pixel_count_array,
-                label_pix_cnt_resize=label_pixel_count_array_resize)
+                 image=image_data,
+                 annotation=annotation_data,
+                 label_pix_resize=label_balance_array_resize,
+                 label_pix=label_balance_array,
+                 label_pix_cnt=label_pixel_count_array,
+                 label_pix_cnt_resize=label_pixel_count_array_resize)
         print("Labels               :", bins)
         print("Pixels in each label :", label_balance_array)
         print("Pixels in each label(with resized images) :", label_balance_array)
@@ -369,12 +371,12 @@ try:
         annotation_data = np.array(annotation_array_list, dtype=np.uint8)
         image_data = np.array(image_array_list, dtype=np.uint8)
         np.savez(VAL_RECORDS,
-                image=image_data,
-                annotation=annotation_data,
-                label_pix_resize=label_balance_array_resize,
-                label_pix=label_balance_array,
-                label_pix_cnt=label_pixel_count_array,
-                label_pix_cnt_resize=label_pixel_count_array_resize)
+                 image=image_data,
+                 annotation=annotation_data,
+                 label_pix_resize=label_balance_array_resize,
+                 label_pix=label_balance_array,
+                 label_pix_cnt=label_pixel_count_array,
+                 label_pix_cnt_resize=label_pixel_count_array_resize)
         print("Labels               :", bins)
         print("Pixels in each label :", label_balance_array)
         print("Pixels in each label(with resized images) :", label_balance_array)
