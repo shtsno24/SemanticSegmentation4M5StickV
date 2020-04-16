@@ -31,8 +31,8 @@ try:
     EPOCHS = 1200
     LABELS = 5
     COLOR_DEPTH = 3
-    CROP_HEIGHT = 64
-    CROP_WIDTH = 64
+    CROP_HEIGHT = 32
+    CROP_WIDTH = 32
 
     with tf.device('/cpu:0'):
         # Load data from .npz
