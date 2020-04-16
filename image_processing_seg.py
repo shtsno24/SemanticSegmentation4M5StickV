@@ -8,9 +8,9 @@ lcd.rotation(2)  # Rotate the lcd 180deg
 sensor.reset(dual_buff=True)
 
 sensor.set_pixformat(sensor.RGB565)
-sensor.set_framesize(sensor.HQVGA)
-window_width = 64
-window_height = 64
+sensor.set_framesize(sensor.HQQQVGA)
+window_width = 32
+window_height = 32
 sensor.set_windowing((window_height, window_width))
 sensor.skip_frames(100)
 sensor.run(1)
@@ -25,7 +25,7 @@ task = kpu.load(0x500000)
 lcd.draw_string(170, 30, "Done")
 
 lcd.draw_string(10, 50, "set outputs")
-fmap = kpu.set_outputs(task, 0, 128, 128, 5)
+fmap = kpu.set_outputs(task, 0, window_height, window_width, 5)
 kpu.memtest()
 lcd.draw_string(170, 50, "Done")
 
@@ -78,7 +78,6 @@ while True:
         lcd.display(img_object)
         a = img_object.clear()
 
-        lcd.display(img)
     except Exception as inst:
         print(inst)
 

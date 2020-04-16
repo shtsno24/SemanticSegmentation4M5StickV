@@ -5,6 +5,8 @@ __pycache__
 *.tar
 *.dot
 *.pdf
+*.exe
+*.bat
 
 scene_parse150/data
 scene_parse150
