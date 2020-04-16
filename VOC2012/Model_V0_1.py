@@ -71,7 +71,7 @@ def bottleneck(x, output_depth, internal_scale=4, Momentum=0.1):
         x_conv = BatchNormalization(momentum=Momentum)(x_conv)
         x_conv = Activation("relu")(x_conv)
 
-    x_conv = Conv2D(output_depth, (1, 1), use_bias=False)(x_conv)
+    x_conv = Conv2D(output_depth, (1, 1))(x_conv)
     x_conv = BatchNormalization(momentum=Momentum)(x_conv)
     x_conv = SpatialDropout2D(0.01)(x_conv)
 
@@ -104,7 +104,7 @@ def bottleneck_downsample(x, output_depth, internal_scale=4, Momentum=0.1):
         x_conv = BatchNormalization(momentum=Momentum)(x_conv)
         x_conv = Activation("relu")(x_conv)
 
-    x_conv = Conv2D(output_depth, (1, 1), use_bias=False)(x_conv)
+    x_conv = Conv2D(output_depth, (1, 1))(x_conv)
     x_conv = BatchNormalization(momentum=Momentum)(x_conv)
     x_conv = SpatialDropout2D(0.01)(x_conv)
 
@@ -126,12 +126,12 @@ def bottleneck_asymmetric(x, asymmetric, output_depth, internal_scale=4, Momentu
     x_conv = Activation("relu")(x_conv)
 
     x_conv = ZeroPadding2D(padding=((pad_half, pad_half), (pad_half, pad_half)))(x_conv)
-    x_conv = Conv2D(internal_depth, (1, asymmetric), use_bias=False)(x_conv)
+    x_conv = Conv2D(internal_depth, (1, asymmetric))(x_conv)
     x_conv = Conv2D(internal_depth, (asymmetric, 1))(x_conv)
     x_conv = BatchNormalization(momentum=Momentum)(x_conv)
     x_conv = Activation("relu")(x_conv)
 
-    x_conv = Conv2D(output_depth, (1, 1), use_bias=False)(x_conv)
+    x_conv = Conv2D(output_depth, (1, 1))(x_conv)
     x_conv = BatchNormalization(momentum=Momentum)(x_conv)
     x_conv = SpatialDropout2D(0.01)(x_conv)
 
@@ -153,9 +153,8 @@ def bottleneck_dilated(x, dilated, output_depth, internal_scale=4, Momentum=0.1)
     x_conv = Activation("relu")(x_conv)
 
     for _ in range(2):
-        x_conv = ZeroPadding2D(padding=((dilated, dilated), (dilated, dilated)))(x_conv)  # <- can't convert to tflite
-        # x_conv = DepthwiseConv2D((1, 1))(x_conv)
-        x_conv = DepthwiseConv2D((3, 3), dilation_rate=(dilated, dilated))(x_conv)
+        # x_conv = ZeroPadding2D(padding=((dilated, dilated), (dilated, dilated)))(x_conv)  # <- can't convert to tflite
+        x_conv = DepthwiseConv2D((3, 3), dilation_rate=(dilated, dilated), padding="same")(x_conv)
         x_conv = BatchNormalization(momentum=Momentum)(x_conv)
         x_conv = Activation("relu")(x_conv)
         x_conv = Conv2D(internal_depth, (1, 1))(x_conv)
@@ -166,7 +165,7 @@ def bottleneck_dilated(x, dilated, output_depth, internal_scale=4, Momentum=0.1)
         # dilation_rate = 8 : padding = 8
         # dilation_rate = 16: padding = 16
 
-    x_conv = Conv2D(output_depth, (1, 1), use_bias=False)(x_conv)
+    x_conv = Conv2D(output_depth, (1, 1))(x_conv)
     x_conv = BatchNormalization(momentum=Momentum)(x_conv)
     x_conv = SpatialDropout2D(0.01)(x_conv)
 
