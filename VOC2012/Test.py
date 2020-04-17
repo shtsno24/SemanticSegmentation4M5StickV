@@ -35,14 +35,13 @@ try:
         for ic in [1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 13, 14, 16, 17, 19]:
             annotation_data[annotation_data == ic] = 0
 
-        # 0:BG 9:CHAIR 11:TABLE 15:PEOPLE 18:SOFA(Same as CHAIR) 20:TV 21:VOID
-        # 0:BG,VOID 1:CHAIR,TABLE,SOFA 2:PEOPLE 3:TV 4:VOID
-        # annotation_data[annotation_data == 5] = 1
+        # 0:BG 9:CHAIR 11:TABLE(Same as CHAIR,SOFA), 15:PEOPLE 18:SOFA(Same as CHAIR, TABLE) 20:TV 21:VOID
+        # 0:BG,VOID 1:CHAIR,SOFA, TABLE 3:PEOPLE 4:TV
         annotation_data[annotation_data == 9] = 1
-        annotation_data[annotation_data == 11] = 2
-        annotation_data[annotation_data == 15] = 3
+        annotation_data[annotation_data == 11] = 1
+        annotation_data[annotation_data == 15] = 2
         annotation_data[annotation_data == 18] = 1
-        annotation_data[annotation_data == 20] = 4
+        annotation_data[annotation_data == 20] = 3
 
         palette = np.array(annotation_object.getpalette(), dtype=np.uint8).reshape(-1, 3)
         palette[21] = 255

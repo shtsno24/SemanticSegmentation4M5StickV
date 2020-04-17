@@ -15,7 +15,7 @@ try:
     # RESIZE_WIDTH = 128
     RESIZE_HEIGHT = 32
     RESIZE_WIDTH = 32
-    LABELS = 5  # With BackGround
+    LABELS = 4  # With BackGround
     COLOR_DEPTH = 3
     SAMPLE = np.random.randint(30)
 
@@ -65,14 +65,13 @@ try:
                     for ic in [1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 13, 14, 16, 17, 19]:
                         annotation_data[annotation_data == ic] = 0
 
-                    # 0:BG 9:CHAIR 11:TABLE 15:PEOPLE 18:SOFA(Same as CHAIR) 20:TV 21:VOID
-                    # 0:BG,VOID 1:CHAIR,SOFA 2:TABLE 3:PEOPLE 4:TV
-                    # annotation_data[annotation_data == 5] = 1
+                    # 0:BG 9:CHAIR 11:TABLE(Same as CHAIR,SOFA), 15:PEOPLE 18:SOFA(Same as CHAIR, TABLE) 20:TV 21:VOID
+                    # 0:BG,VOID 1:CHAIR,SOFA,TABLE 3:PEOPLE 4:TV
                     annotation_data[annotation_data == 9] = 1
-                    annotation_data[annotation_data == 11] = 2
-                    annotation_data[annotation_data == 15] = 3
+                    annotation_data[annotation_data == 11] = 1
+                    annotation_data[annotation_data == 15] = 2
                     annotation_data[annotation_data == 18] = 1
-                    annotation_data[annotation_data == 20] = 4
+                    annotation_data[annotation_data == 20] = 3
 
                     hist, bins = np.histogram(annotation_data, bins=np.arange(LABELS + 1))
                     label_balance_array += hist
@@ -81,7 +80,7 @@ try:
                     if i == 0:
                         palette_raw = np.array(annotation_object.getpalette(), dtype=np.uint8).reshape(-1, 3)
 
-                        for index, ic in enumerate([0, 9, 11, 15, 20]):
+                        for index, ic in enumerate([0, 9, 15, 20]):
                             palette_raw[index][0] = palette_raw[ic][0]
                             palette_raw[index][1] = palette_raw[ic][1]
                             palette_raw[index][2] = palette_raw[ic][2]
@@ -184,14 +183,13 @@ try:
                     for ic in [1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 13, 14, 16, 17, 19]:
                         annotation_data[annotation_data == ic] = 0
 
-                    # 0:BG 9:CHAIR 11:TABLE 15:PEOPLE 18:SOFA(Same as CHAIR) 20:TV 21:VOID
-                    # 0:BG,VOID 1:CHAIR,TABLE,SOFA 2:PEOPLE 3:TV 4:VOID
-                    # annotation_data[annotation_data == 5] = 1
+                    # 0:BG 9:CHAIR 11:TABLE(Same as CHAIR,SOFA), 15:PEOPLE 18:SOFA(Same as CHAIR, TABLE) 20:TV 21:VOID
+                    # 0:BG,VOID 1:CHAIR,SOFA,TABLE 3:PEOPLE 4:TV
                     annotation_data[annotation_data == 9] = 1
-                    annotation_data[annotation_data == 11] = 2
-                    annotation_data[annotation_data == 15] = 3
+                    annotation_data[annotation_data == 11] = 1
+                    annotation_data[annotation_data == 15] = 2
                     annotation_data[annotation_data == 18] = 1
-                    annotation_data[annotation_data == 20] = 4
+                    annotation_data[annotation_data == 20] = 3
 
                     hist, bins = np.histogram(annotation_data, bins=np.arange(LABELS + 1))
                     label_balance_array += hist
@@ -302,14 +300,13 @@ try:
                     for ic in [1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 13, 14, 16, 17, 19]:
                         annotation_data[annotation_data == ic] = 0
 
-                    # 0:BG 9:CHAIR 11:TABLE 15:PEOPLE 18:SOFA(Same as CHAIR) 20:TV 21:VOID
-                    # 0:BG,VOID 1:CHAIR,TABLE,SOFA 2:PEOPLE 3:TV 4:VOID
-                    # annotation_data[annotation_data == 5] = 1
+                    # 0:BG 9:CHAIR 11:TABLE(Same as CHAIR,SOFA), 15:PEOPLE 18:SOFA(Same as CHAIR, TABLE) 20:TV 21:VOID
+                    # 0:BG,VOID 1:CHAIR,SOFA,TABLE 3:PEOPLE 4:TV
                     annotation_data[annotation_data == 9] = 1
-                    annotation_data[annotation_data == 11] = 2
-                    annotation_data[annotation_data == 15] = 3
+                    annotation_data[annotation_data == 11] = 1
+                    annotation_data[annotation_data == 15] = 2
                     annotation_data[annotation_data == 18] = 1
-                    annotation_data[annotation_data == 20] = 4
+                    annotation_data[annotation_data == 20] = 3
 
                     hist, bins = np.histogram(annotation_data, bins=np.arange(LABELS + 1))
                     label_balance_array += hist

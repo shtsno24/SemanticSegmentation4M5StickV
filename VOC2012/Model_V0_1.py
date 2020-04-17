@@ -7,7 +7,7 @@ from tensorflow.keras.layers import LeakyReLU, Add, PReLU, SpatialDropout2D, Zer
 from tensorflow.keras.losses import sparse_categorical_crossentropy
 
 
-def weighted_SparseCategoricalCrossentropy(sample_weights, classes=5):
+def weighted_SparseCategoricalCrossentropy(sample_weights, classes=4):
     def loss_function(y_true, y_pred):
         y_true = tf.cast(y_true, tf.uint8)
         y_true = tf.one_hot(y_true, depth=classes)
