@@ -19,110 +19,87 @@ def weighted_SparseCategoricalCrossentropy(sample_weights, classes=5):
     return loss_function
 
 
-def SkipConvBlock(x, output_channel, kernel_size, padding, internal_mag=4, momentum=0.1, drop_rate=0.01):
-    internal_channel = int(output_channel / internal_mag) * (internal_mag - 1)
-    skip_channel = output_channel - internal_channel
+def SkipConvBlock(x, output_channel, kernel_size=(3, 3), padding=((1, 1), (1, 1)), internal_mag=4, momentum=0.1, drop_rate=0.01, activation=True):
+    internal_channel = int(output_channel / internal_mag)
 
-    C = Conv2D(internal_channel, (1, 1))(x)
-    C = BatchNormalization(momentum=momentum)(C)
-    C = ReLU()(C)
-    C = ZeroPadding2D(padding=padding)(C)
-    C = DepthwiseConv2D(kernel_size)(C)
-    C = BatchNormalization(momentum=momentum)(C)
-    C = ReLU()(C)
-    C = Conv2D(output_channel, (1, 1))(x)
-    C = BatchNormalization(momentum=momentum)(C)
-    C = ReLU()(C)
+    Conv = Conv2D(internal_channel, (1, 1))(x)
 
-    Skip = Conv2D(skip_channel, (1, 1))(x)
-    Skip = BatchNormalization(momentum=momentum)(Skip)
-    Skip = ReLU()(Skip)
+    Conv = ZeroPadding2D(padding=padding)(Conv)
+    Conv = DepthwiseConv2D(kernel_size)(Conv)
+    Conv = BatchNormalization(momentum=momentum)(Conv)
+    Conv = SpatialDropout2D(drop_rate)(Conv)
+    Conv = ReLU()(Conv)
 
-    x = Concatenate(axis=3)([Skip, C])
+    Conv = Conv2D(output_channel, (1, 1))(Conv)
+    Conv = BatchNormalization(momentum=momentum)(Conv)
+    Conv = ReLU()(Conv)
+
+    x = Concatenate(axis=3)([Conv, x])
     x = Conv2D(output_channel, (1, 1))(x)
     x = BatchNormalization(momentum=momentum)(x)
-    x = ReLU()(x)
-
-    return x
-
-
-def SkipConvBlockD(x, output_channel, kernel_size, padding, internal_mag=4, momentum=0.1, drop_rate=0.01):
-    internal_channel = int(output_channel / internal_mag) * (internal_mag - 1)
-    skip_channel = output_channel - internal_channel
-
-    C = Conv2D(internal_channel, (1, 1))(x)
-    C = BatchNormalization(momentum=momentum)(C)
-    C = ReLU()(C)
-    C = ZeroPadding2D(padding=padding)(C)
-    C = DepthwiseConv2D(kernel_size)(C)
-    C = BatchNormalization(momentum=momentum)(C)
-    C = ReLU()(C)
-    C = Conv2D(output_channel, (1, 1))(C)
-    C = BatchNormalization(momentum=momentum)(C)
-    C = ReLU()(C)
-
-    Skip = Conv2D(skip_channel, (1, 1))(x)
-    Skip = BatchNormalization(momentum=momentum)(Skip)
-    Skip = ReLU()(Skip)
-
-    x = Concatenate(axis=3)([Skip, C])
-    x = ZeroPadding2D(padding=((1, 1), (1, 1)))(x)
-    x = DepthwiseConv2D((3, 3), strides=(2, 2))(x)
-    x = BatchNormalization(momentum=momentum)(x)
-    x = ReLU()(x)
-
-    return x
-
-
-def SkipConvBlockU(x, output_channel, kernel_size, padding, activation=True, internal_mag=4, momentum=0.1, drop_rate=0.01):
-    internal_channel = int(output_channel / internal_mag) * (internal_mag - 1)
-    skip_channel = output_channel - internal_channel
-
-    C = Conv2D(internal_channel, (1, 1))(x)
-    C = BatchNormalization(momentum=momentum)(C)
-    C = ReLU()(C)
-    C = ZeroPadding2D(padding=padding)(C)
-    C = DepthwiseConv2D(kernel_size)(C)
-    C = BatchNormalization(momentum=momentum)(C)
-    C = ReLU()(C)
-    C = Conv2D(output_channel, (1, 1))(C)
-    C = BatchNormalization(momentum=momentum)(C)
-    C = ReLU()(C)
-
-    Skip = Conv2D(skip_channel, (1, 1))(x)
-    Skip = BatchNormalization(momentum=momentum)(Skip)
-    Skip = ReLU()(Skip)
-
-    x = Concatenate(axis=3)([Skip, C])
-    x = UpSampling2D(size=(2, 2))(x)
-    x = Conv2D(output_channel, (1, 1))(x)
-    x = BatchNormalization(momentum=momentum)(x)
+    x = SpatialDropout2D(drop_rate)(x)
     if activation is True:
         x = ReLU()(x)
 
     return x
 
 
-def TestNet(input_shape=(64, 64, 3), classes=5):
-    inputs = Input(shape=input_shape)
-    x0 = SkipConvBlockD(inputs, 8, (3, 3), padding=((1, 1), (1, 1)), internal_mag=2)
-    # for _ in range(2):
-    #     x0 = SkipConvBlock(x0, 32, (3, 3), padding=(1, 1))
-    # 32 x 32 x 32
-    x1 = SkipConvBlockD(x0, 16, (3, 3), padding=((1, 1), (1, 1)))
-    # for _ in range(4):
-    #     x1 = SkipConvBlock(x1, 64, (3, 3), padding=(1, 1))
-    # 16 x 16 x 64
-    x2 = SkipConvBlockD(x1, 32, (3, 3), padding=((1, 1), (1, 1)))
-    # for _ in range(8):
-    #     x2 = SkipConvBlock(x2, 128, (3, 3), padding=(1, 1))
-    # 8 x 8 x 128
+def SkipConvBlockD(x, output_channel, kernel_size=(3, 3), padding=((1, 1), (1, 1)), internal_mag=4, momentum=0.1, drop_rate=0.01):
+    internal_channel = int(output_channel / internal_mag)
 
-    x1 = UpSampling2D(size=(2, 2))(x1)
-    x2 = UpSampling2D(size=(4, 4))(x2)
-    x = Concatenate(axis=3)([x0, x1, x2])
-    # 32 x 32 x (32 + 64 + 128)
-    x = SkipConvBlockU(x, classes, (3, 3), padding=((1, 1), (1, 1)), activation=False, internal_mag=2)
+    Conv = Conv2D(internal_channel, (1, 1))(x)
+
+    Conv = ZeroPadding2D(padding=padding)(Conv)
+    Conv = DepthwiseConv2D(kernel_size)(Conv)
+    Conv = BatchNormalization(momentum=momentum)(Conv)
+    Conv = SpatialDropout2D(drop_rate)(Conv)
+    Conv = ReLU()(Conv)
+
+    Conv = Conv2D(output_channel, (1, 1))(Conv)
+    Conv = BatchNormalization(momentum=momentum)(Conv)
+    Conv = ReLU()(Conv)
+
+    x = Concatenate(axis=3)([x, Conv])
+    x = MaxPooling2D(pool_size=(2, 2))(x)
+    x = Conv2D(output_channel, (1, 1))(x)
+    x = BatchNormalization(momentum=momentum)(x)
+    x = SpatialDropout2D(drop_rate)(X)
+    x = ReLU()(x)
+
+    return x
+
+
+def SkipConvBlockU(x, output_channel, kernel_size=(3, 3), padding=((1, 1), (1, 1)), activation=True, internal_mag=4, momentum=0.1, drop_rate=0.01):
+    internal_channel = int(output_channel / internal_mag)
+
+    Conv = Conv2D(internal_channel, (1, 1))(x)
+
+    Conv = ZeroPadding2D(padding=padding)(Conv)
+    Conv = DepthwiseConv2D(kernel_size)(Conv)
+    Conv = BatchNormalization(momentum=momentum)(Conv)
+    Conv = SpatialDropout2D(drop_rate)(Conv)
+    Conv = ReLU()(Conv)
+
+    Conv = Conv2D(output_channel, (1, 1))(Conv)
+    Conv = BatchNormalization(momentum=momentum)(Conv)
+    Conv = ReLU()(Conv)
+
+    x = Concatenate(axis=3)([x, Conv])
+    x = UpSampling2D(size=(2, 2))(x)
+    x = Conv2D(output_channel, (1, 1))(x)
+    x = BatchNormalization(momentum=momentum)(x)
+    x = SpatialDropout2D(drop_rate)(x)
+    if activation is True:
+        x = ReLU()(x)
+
+    return x
+
+
+def TestNet(input_shape=(32, 32, 3), classes=5):
+    inputs = Input(shape=input_shape)
+
+    x = SkipConvBlock(inputs, classes)
+
     outputs = Softmax()(x)
     model = Model(inputs, outputs)
     return model

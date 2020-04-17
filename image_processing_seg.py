@@ -22,11 +22,11 @@ lcd.draw_string(170, 10, "Running")
 
 lcd.draw_string(10, 30, "load kmodel")
 kpu.memtest()
-task = kpu.load(0x500000)
+task = kpu.load(0x400000)
 lcd.draw_string(170, 30, "Done")
 
 lcd.draw_string(10, 50, "set outputs")
-fmap = kpu.set_outputs(task, 0, window_height, window_width, 5)
+fmap = kpu.set_outputs(task, 0, window_height, window_width, classes)
 kpu.memtest()
 lcd.draw_string(170, 50, "Done")
 
@@ -49,15 +49,14 @@ scale = 3
 debug = 1
 while True:
     try:
+        print("take a snapshot")
         img = sensor.snapshot()         # Take a picture and return the image.
-        if debug:
-            print("take a snapshot")
         clock.tick()
+        print("run kpu")
         fmap = kpu.forward(task, img)
-        if debug:
-            print("run kpu")
         data_tuple = fmap[:]
 
+        print("make image")
         for i in range(window_height * window_width):
             for c in range(classes):
                 data = data_tuple[c * window_height * window_width + i]
@@ -66,9 +65,8 @@ while True:
             _h = int(i / window_height)
             for _w_ in range(scale):
                 for _h_ in range(scale):
-                    a = img_object.set_pixel(scale * _w + _w_, scale * _h + _h_, color_dict[np.argmax(output_array)])
-        if debug:
-            print("make image")
+                    a = img_object.set_pixel(scale * _w + _w_, scale * _h + _h_,
+                                             color_dict[np.argmax(output_array)])
 
         fps = clock.fps()
         fps_0 = int(fps)
