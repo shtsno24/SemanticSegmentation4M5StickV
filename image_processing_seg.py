@@ -11,6 +11,7 @@ sensor.set_pixformat(sensor.RGB565)
 sensor.set_framesize(sensor.HQQQVGA)
 window_width = 32
 window_height = 32
+classes = 5
 sensor.set_windowing((window_height, window_width))
 sensor.skip_frames(100)
 sensor.run(1)
@@ -58,7 +59,7 @@ while True:
         data_tuple = fmap[:]
 
         for i in range(window_height * window_width):
-            for c in range(5):
+            for c in range(classes):
                 data = data_tuple[c * window_height * window_width + i]
                 output_array[c] = data
             _w = i % window_width

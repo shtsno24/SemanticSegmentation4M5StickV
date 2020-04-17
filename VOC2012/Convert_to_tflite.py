@@ -9,7 +9,7 @@ try:
     # MODEL_TFLITE = "model_viewer.tflite"
     MODEL_FILE = "Model_V0_1.h5"
     MODEL_TFLITE = "Model_V0_1.tflite"
-    LABELS = 4
+    LABELS = 5
     COLOR_DEPTH = 3
     CROP_HEIGHT = 32  # sensor.LCD[128, 160]
     CROP_WIDTH = 32
