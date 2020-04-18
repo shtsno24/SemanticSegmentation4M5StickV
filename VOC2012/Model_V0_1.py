@@ -19,7 +19,7 @@ def weighted_SparseCategoricalCrossentropy(sample_weights, classes=5):
     return loss_function
 
 
-def SkipConvBlock(x, output_channel, kernel_size=(3, 3), padding=((1, 1), (1, 1)), internal_mag=4, momentum=0.1, drop_rate=0.01, activation=True):
+def SkipConvBlock(x, output_channel, kernel_size=(3, 3), padding=((1, 1), (1, 1)), activation=True, internal_mag=4, momentum=0.1, drop_rate=0.01):
     internal_channel = int(output_channel / internal_mag)
 
     Conv = Conv2D(internal_channel, (1, 1))(x)
@@ -44,7 +44,7 @@ def SkipConvBlock(x, output_channel, kernel_size=(3, 3), padding=((1, 1), (1, 1)
     return x
 
 
-def SkipConvBlockD(x, output_channel, kernel_size=(3, 3), padding=((1, 1), (1, 1)), internal_mag=4, momentum=0.1, drop_rate=0.01):
+def SkipConvBlockD(x, output_channel, kernel_size=(3, 3), padding=((1, 1), (1, 1)), activation=True, internal_mag=4, momentum=0.1, drop_rate=0.01):
     internal_channel = int(output_channel / internal_mag)
 
     Conv = Conv2D(internal_channel, (1, 1))(x)
@@ -63,8 +63,9 @@ def SkipConvBlockD(x, output_channel, kernel_size=(3, 3), padding=((1, 1), (1, 1
     x = MaxPooling2D(pool_size=(2, 2))(x)
     x = Conv2D(output_channel, (1, 1))(x)
     x = BatchNormalization(momentum=momentum)(x)
-    x = SpatialDropout2D(drop_rate)(X)
-    x = ReLU()(x)
+    x = SpatialDropout2D(drop_rate)(x)
+    if activation is True:
+        x = ReLU()(x)
 
     return x
 
@@ -98,8 +99,22 @@ def SkipConvBlockU(x, output_channel, kernel_size=(3, 3), padding=((1, 1), (1, 1
 def TestNet(input_shape=(32, 32, 3), classes=5):
     inputs = Input(shape=input_shape)
 
-    x = SkipConvBlock(inputs, classes)
+    x0 = SkipConvBlockD(inputs, 8, internal_mag=2)
+    x0 = SkipConvBlock(x0, 8, internal_mag=2)
 
-    outputs = Softmax()(x)
+    x1 = SkipConvBlockD(x0, 16)
+    for _ in range(2):
+        x1 = SkipConvBlock(x1, 16)
+
+    x2 = SkipConvBlockD(x1, 32)
+    for _ in range(4):
+        x2 = SkipConvBlock(x2, 32)
+
+    x2 = UpSampling2D(size=(4, 4))(x2)
+    x1 = UpSampling2D(size=(2, 2))(x1)
+    x = Concatenate(axis=3)([x0, x1, x2])
+
+    x = SkipConvBlockU(x, classes, internal_mag=2)
+    outputs = x
     model = Model(inputs, outputs)
     return model
