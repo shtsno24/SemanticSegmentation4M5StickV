@@ -117,7 +117,7 @@ def TestNet(input_shape=(32, 32, 3), classes=5):
 
     x = SkipConvBlockU(x, classes, internal_mag=2, activation=False)
     x = Reshape((32*32, classes))(x)
-    x = Softmax()(x)
+    x = Softmax(axis=1)(x)
     x = Reshape((32, 32, classes))(x)
     outputs = x
     model = Model(inputs, outputs)
