@@ -27,7 +27,6 @@ def SkipConvBlock(x, output_channel, kernel_size=(3, 3), padding=((1, 1), (1, 1)
     Conv = ZeroPadding2D(padding=padding)(Conv)
     Conv = DepthwiseConv2D(kernel_size)(Conv)
     Conv = BatchNormalization(momentum=momentum)(Conv)
-    Conv = SpatialDropout2D(drop_rate)(Conv)
     Conv = ReLU()(Conv)
 
     Conv = Conv2D(output_channel, (1, 1))(Conv)
@@ -52,7 +51,6 @@ def SkipConvBlockD(x, output_channel, kernel_size=(3, 3), padding=((1, 1), (1, 1
     Conv = ZeroPadding2D(padding=padding)(Conv)
     Conv = DepthwiseConv2D(kernel_size)(Conv)
     Conv = BatchNormalization(momentum=momentum)(Conv)
-    Conv = SpatialDropout2D(drop_rate)(Conv)
     Conv = ReLU()(Conv)
 
     Conv = Conv2D(output_channel, (1, 1))(Conv)
@@ -78,7 +76,6 @@ def SkipConvBlockU(x, output_channel, kernel_size=(3, 3), padding=((1, 1), (1, 1
     Conv = ZeroPadding2D(padding=padding)(Conv)
     Conv = DepthwiseConv2D(kernel_size)(Conv)
     Conv = BatchNormalization(momentum=momentum)(Conv)
-    Conv = SpatialDropout2D(drop_rate)(Conv)
     Conv = ReLU()(Conv)
 
     Conv = Conv2D(output_channel, (1, 1))(Conv)
@@ -99,23 +96,29 @@ def SkipConvBlockU(x, output_channel, kernel_size=(3, 3), padding=((1, 1), (1, 1
 def TestNet(input_shape=(32, 32, 3), classes=5):
     inputs = Input(shape=input_shape)
 
-    x0 = SkipConvBlockD(inputs, 8, internal_mag=2)
-    x0 = SkipConvBlock(x0, 8, internal_mag=2)
-
-    x1 = SkipConvBlockD(x0, 16)
+    x0 = SkipConvBlockD(inputs, 16, internal_mag=2)
     for _ in range(2):
-        x1 = SkipConvBlock(x1, 16)
+        x0 = SkipConvBlock(x0, 16, internal_mag=2)
 
-    x2 = SkipConvBlockD(x1, 32)
+    x1 = SkipConvBlockD(x0, 32)
     for _ in range(4):
-        x2 = SkipConvBlock(x2, 32)
+        x1 = SkipConvBlock(x1, 32)
+
+    x2 = SkipConvBlockD(x1, 64)
+    for _ in range(16):
+        x2 = SkipConvBlock(x2, 64)
 
     x2 = UpSampling2D(size=(4, 4))(x2)
     x1 = UpSampling2D(size=(2, 2))(x1)
     x = Concatenate(axis=3)([x0, x1, x2])
 
+    for _ in range(2):
+        x = SkipConvBlock(x, 32)
+
     x = SkipConvBlockU(x, classes, internal_mag=2, activation=False)
-    # x = Softmax()(x)
+    x = Reshape((32*32, classes))(x)
+    x = Softmax()(x)
+    x = Reshape((32, 32, classes))(x)
     outputs = x
     model = Model(inputs, outputs)
     return model
