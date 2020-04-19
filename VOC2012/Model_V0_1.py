@@ -3,7 +3,7 @@ from tensorflow.keras.models import Model
 
 from tensorflow.keras.layers import Input, Conv2D, DepthwiseConv2D, MaxPooling2D, Conv2DTranspose
 from tensorflow.keras.layers import UpSampling2D, Activation, Concatenate, BatchNormalization, Reshape
-from tensorflow.keras.layers import LeakyReLU, Add, PReLU, SpatialDropout2D, ZeroPadding2D, Softmax, ReLU
+from tensorflow.keras.layers import LeakyReLU, Add, PReLU, SpatialDropout2D, ZeroPadding2D, Softmax, ReLU, Flatten
 from tensorflow.keras.losses import sparse_categorical_crossentropy
 
 
@@ -114,7 +114,8 @@ def TestNet(input_shape=(32, 32, 3), classes=5):
     x1 = UpSampling2D(size=(2, 2))(x1)
     x = Concatenate(axis=3)([x0, x1, x2])
 
-    x = SkipConvBlockU(x, classes, internal_mag=2)
+    x = SkipConvBlockU(x, classes, internal_mag=2, activation=False)
+    # x = Softmax()(x)
     outputs = x
     model = Model(inputs, outputs)
     return model
