@@ -4,7 +4,6 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Conv2D, DepthwiseConv2D, MaxPooling2D, Conv2DTranspose
 from tensorflow.keras.layers import UpSampling2D, Activation, Concatenate, BatchNormalization, Reshape
 from tensorflow.keras.layers import LeakyReLU, Add, PReLU, SpatialDropout2D, ZeroPadding2D, Softmax, ReLU, Flatten
-from tensorflow.keras.losses import sparse_categorical_crossentropy
 
 
 def weighted_SparseCategoricalCrossentropy(sample_weights, classes=5):
@@ -13,9 +12,18 @@ def weighted_SparseCategoricalCrossentropy(sample_weights, classes=5):
         y_true = tf.one_hot(y_true, depth=classes)
         y_true = tf.cast(y_true, tf.float32)
         y_true = y_true * sample_weights
-        # cce = tf.keras.losses.SparseCategoricalCrossentropy()
+        y_pred = tf.keras.backend.softmax(y_pred)
         cce = tf.keras.losses.CategoricalCrossentropy()
         return cce(y_true, y_pred)
+
+        # y_true = tf.cast(y_true, tf.uint8)
+        # y_true = tf.one_hot(y_true, depth=classes)
+        # y_true = tf.cast(y_true, tf.float32)
+        # y_pred = tf.keras.backend.l2_normalize(y_pred, axis=-1)
+        # e = tf.keras.backend.square(y_true - y_pred)
+        # e = e * sample_weights
+        # e = tf.keras.backend.mean(e, keepdims=True)
+        # return e
     return loss_function
 
 
@@ -116,9 +124,7 @@ def TestNet(input_shape=(32, 32, 3), classes=5):
         x = SkipConvBlock(x, 32)
 
     x = SkipConvBlockU(x, classes, internal_mag=2, activation=False)
-    x = Reshape((32*32, classes))(x)
-    x = Softmax(axis=1)(x)
-    x = Reshape((32, 32, classes))(x)
+    # x = Softmax()(x)
     outputs = x
     model = Model(inputs, outputs)
     return model
