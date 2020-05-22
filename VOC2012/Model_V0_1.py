@@ -341,10 +341,10 @@ def TestNet(input_shape=(32, 32, 3), classes=5):
     # 64 x 80 x 16
 
     x = Conv2DTranspose(classes, kernel_size=(2, 2), strides=(2, 2), padding="same")(x)
-
     # 128 x 160 x 16
 
-    outputs = Activation("softmax")(x)
+    # outputs = Activation("softmax")(x)
+    outputs = Softmax()(x)
     # outputs = x
     model = Model(inputs, outputs)
     return model
