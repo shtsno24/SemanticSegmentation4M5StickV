@@ -50,7 +50,7 @@ def ESP_Module(x, out_depth, internal_depth_ratio=4, Momentum=0.01, Alpha=0.3, A
 
     x_conv = Concatenate(axis=3)([x_conv_d1, add_1, add_2, add_3])
 
-    if Add_flag == True:
+    if Add_flag is True:
         x_conv = Add()([x_conv, x])
 
     x_conv = BatchNormalization(momentum=Momentum)(x_conv)

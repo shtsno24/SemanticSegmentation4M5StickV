@@ -13,8 +13,8 @@ try:
 
     # RESIZE_HEIGHT = 128
     # RESIZE_WIDTH = 128
-    RESIZE_HEIGHT = 32
-    RESIZE_WIDTH = 32
+    RESIZE_HEIGHT = 64
+    RESIZE_WIDTH = 64
     LABELS = 5  # With BackGround
     COLOR_DEPTH = 3
     SAMPLE = np.random.randint(30)

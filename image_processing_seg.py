@@ -9,8 +9,8 @@ sensor.reset(dual_buff=True)
 
 sensor.set_pixformat(sensor.RGB565)
 sensor.set_framesize(sensor.HQQQVGA)
-window_width = 32
-window_height = 32
+window_width = 64
+window_height = 64
 classes = 5
 sensor.set_windowing((window_height, window_width))
 sensor.skip_frames(100)

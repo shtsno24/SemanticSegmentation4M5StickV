@@ -9,8 +9,8 @@ try:
     MODEL_FILE = "Model_V0_1.h5"
     LABELS = 5
     COLOR_DEPTH = 3
-    CROP_HEIGHT = 32  # sensor.LCD[32, 32]
-    CROP_WIDTH = 32
+    CROP_HEIGHT = 64  # sensor.LCD[32, 32]
+    CROP_WIDTH = 64
 
     # Load model
     print("\n\nLoad Model...\n")

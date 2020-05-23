@@ -11,8 +11,8 @@ try:
     MODEL_TFLITE = "Model_V0_1.tflite"
     LABELS = 5
     COLOR_DEPTH = 3
-    CROP_HEIGHT = 32  # sensor.LCD[128, 160]
-    CROP_WIDTH = 32
+    CROP_HEIGHT = 64  # sensor.LCD[128, 160]
+    CROP_WIDTH = 64
 
     with tf.device('/cpu:0'):
         # Load model

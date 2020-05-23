@@ -31,8 +31,8 @@ try:
     EPOCHS = 1200
     LABELS = 5
     COLOR_DEPTH = 3
-    CROP_HEIGHT = 32
-    CROP_WIDTH = 32
+    CROP_HEIGHT = 64
+    CROP_WIDTH = 64
 
     with tf.device('/cpu:0'):
         # Load data from .npz
@@ -70,7 +70,7 @@ try:
     # Load model
     print("Load Model...\n\n")
     model = Model.TestNet(input_shape=(CROP_HEIGHT, CROP_WIDTH, 3), classes=LABELS)
-    model.summary()
+    # model.summary()
     print("\nDone")
 
     try:
