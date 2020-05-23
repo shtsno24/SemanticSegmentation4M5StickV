@@ -15,11 +15,7 @@ try:
     # Load model
     print("\n\nLoad Model...\n")
     model_old = tf.keras.models.load_model(MODEL_FILE, custom_objects={'loss_function': Model_V0_1.weighted_SparseCategoricalCrossentropy(LABELS)})
-    # for i, layer in enumerate(model_old.layers[:-1]):
-    #     print(i, layer.name)
-    layers = [l.output for l in model_old.layers[:-1]]
     model_new = Model(model_old.input, model_old.layers[-2].output)
-    # model_new.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
     model_new.summary()
     print("\nDone")
 
