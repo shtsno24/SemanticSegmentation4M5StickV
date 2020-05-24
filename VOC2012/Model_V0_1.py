@@ -11,9 +11,9 @@ def weighted_SparseCategoricalCrossentropy(sample_weights, classes=5):
         y_true = tf.cast(y_true, tf.uint8)
         y_true = tf.one_hot(y_true, depth=classes)
         y_true = tf.cast(y_true, tf.float32)
-        y_true = y_true * (sample_weights ** 2)
         cce = tf.keras.losses.CategoricalCrossentropy()
-        return cce(y_true, y_pred)
+        error = cce(y_true, y_pred) * sample_weights
+        return error
     return loss_function
 
 
@@ -113,7 +113,7 @@ def Normal_block(x, input_depth, channel, Momentum=0.1):
     return y
 
 
-def TestNet(input_shape=(64, 64, 3), classes=5):
+def TestNet(input_shape=(32, 32, 3), classes=5):
 
     input_0 = Input(shape=input_shape)
 

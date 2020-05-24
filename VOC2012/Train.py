@@ -20,10 +20,10 @@ if gpus:
         print(e)
 
 try:
-    TRAIN_RECORDS = "./data/VOC2012_resize_train.npz"
-    TEST_RECORDS = "./data/VOC2012_resize_val.npz"
-    # TRAIN_RECORDS = "./VOC2012_resize_train.npz"
-    # TEST_RECORDS = "./VOC2012_resize_val.npz"
+    # TRAIN_RECORDS = "./data/VOC2012_resize_train.npz"
+    # TEST_RECORDS = "./data/VOC2012_resize_val.npz"
+    TRAIN_RECORDS = "./VOC2012_resize_train.npz"
+    TEST_RECORDS = "./VOC2012_resize_val.npz"
     BATCH_SIZE = 8
     SHUFFLE_SIZE = 100
     TRAIN_DATASET_SIZE = 1464 * 2
@@ -31,8 +31,8 @@ try:
     EPOCHS = 1200
     LABELS = 5
     COLOR_DEPTH = 3
-    CROP_HEIGHT = 64
-    CROP_WIDTH = 64
+    CROP_HEIGHT = 32
+    CROP_WIDTH = 32
 
     with tf.device('/cpu:0'):
         # Load data from .npz
@@ -48,6 +48,7 @@ try:
 
         image_freq = label_balance_array_resize / label_pixel_count_array_resize
         CLASS_WEIGHT = {i: (np.median(image_freq) / image_freq)[i] for i in range(LABELS)}
+        CLASS_WEIGHT[0] = 0
         SAMPLE_WEIGHT = np.array([[[CLASS_WEIGHT[w] for w in range(LABELS)] for rows in range(CROP_WIDTH)] for columns in range(CROP_HEIGHT)])
         SAMPLE_WEIGHT = SAMPLE_WEIGHT.reshape((1,) + SAMPLE_WEIGHT.shape)
 
@@ -76,7 +77,7 @@ try:
     try:
         # Train model
         print("\n\nTrain Model...")
-        model.compile(loss=Model.weighted_SparseCategoricalCrossentropy(SAMPLE_WEIGHT, classes=LABELS), optimizer='adagrad', metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
+        model.compile(loss=Model.weighted_SparseCategoricalCrossentropy(SAMPLE_WEIGHT, classes=LABELS), optimizer='adam', metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
         model.fit(train_dataset, validation_data=test_dataset, epochs=EPOCHS,
                 steps_per_epoch=int(TRAIN_DATASET_SIZE / BATCH_SIZE),
                 validation_steps=int(TEST_DATASET_SIZE / BATCH_SIZE / 100))
