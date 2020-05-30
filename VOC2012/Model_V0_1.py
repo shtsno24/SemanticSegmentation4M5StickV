@@ -121,13 +121,15 @@ def TestNet(input_shape=(32, 32, 3), classes=5):
     input_1 = MaxPooling2D(pool_size=(2, 2))(input_0)
     x_1 = Concatenate(axis=3)([x, input_1])
 
-    for _ in range(2):
+    x = Normal_block(x_1, 32, 64)
+    for _ in range(1):
         x = Normal_block(x, 32, 64)
     x = DownSampling_block(x, 64, 128 - 3)
     input_2 = MaxPooling2D(pool_size=(2, 2))(input_1)
     x_2 = Concatenate(axis=3)([x, input_2])
 
-    for _ in range(4):
+    x = Normal_block(x_2, 128, 128)
+    for _ in range(3):
         x = Normal_block(x, 128, 128)
     x = Normal_block(x, 128, 64)
 

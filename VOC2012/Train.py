@@ -20,10 +20,10 @@ if gpus:
         print(e)
 
 try:
-    # TRAIN_RECORDS = "./data/VOC2012_resize_train.npz"
-    # TEST_RECORDS = "./data/VOC2012_resize_val.npz"
-    TRAIN_RECORDS = "./VOC2012_resize_train.npz"
-    TEST_RECORDS = "./VOC2012_resize_val.npz"
+    TRAIN_RECORDS = "./data/VOC2012_resize_train.npz"
+    TEST_RECORDS = "./data/VOC2012_resize_val.npz"
+    # TRAIN_RECORDS = "./VOC2012_resize_train.npz"
+    # TEST_RECORDS = "./VOC2012_resize_val.npz"
     BATCH_SIZE = 8
     SHUFFLE_SIZE = 100
     TRAIN_DATASET_SIZE = 1464 * 2
