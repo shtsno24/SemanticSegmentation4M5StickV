@@ -18,7 +18,12 @@ def weighted_SparseCategoricalCrossentropy(sample_weights, classes=5):
 
 
 def DownSampling_block(x, input_depth, channel, Momentum=0.1):
-    internal_channel = int((channel / 3))
+    if channel > input_depth:
+        internal_channel = int((channel - input_depth) / 2)
+    elif channel < input_depth:
+        internal_channel = int((input_depth - channel) / 2)
+    else:
+        internal_channel = int(channel / 2)
 
     x_conv = Conv2D(internal_channel, (1, 1))(x)
     x_conv = BatchNormalization(momentum=Momentum)(x_conv)
@@ -50,7 +55,12 @@ def DownSampling_block(x, input_depth, channel, Momentum=0.1):
 
 
 def UpSampling_block(x, input_depth, channel, Momentum=0.1):
-    internal_channel = int((channel / 3))
+    if channel > input_depth:
+        internal_channel = int((channel - input_depth) / 2)
+    elif channel < input_depth:
+        internal_channel = int((input_depth - channel) / 2)
+    else:
+        internal_channel = int(channel / 2)
 
     x_conv = Conv2D(internal_channel, (1, 1))(x)
     x_conv = BatchNormalization(momentum=Momentum)(x_conv)
@@ -83,7 +93,12 @@ def UpSampling_block(x, input_depth, channel, Momentum=0.1):
 
 
 def Normal_block(x, input_depth, channel, Momentum=0.1):
-    internal_channel = int((channel / 3))
+    if channel > input_depth:
+        internal_channel = int((channel - input_depth) / 2)
+    elif channel < input_depth:
+        internal_channel = int((input_depth - channel) / 2)
+    else:
+        internal_channel = int(channel / 2)
 
     x_conv = Conv2D(internal_channel, (1, 1))(x)
     x_conv = BatchNormalization(momentum=Momentum)(x_conv)
@@ -121,24 +136,30 @@ def TestNet(input_shape=(32, 32, 3), classes=5):
     input_1 = MaxPooling2D(pool_size=(2, 2))(input_0)
     x_1 = Concatenate(axis=3)([x, input_1])
 
+    x_1 = Conv2D(32, (1, 1))(x_1)
+    x_1 = BatchNormalization(momentum=0.1)(x_1)
+    x_1 = Activation("relu")(x_1)
     x = Normal_block(x_1, 32, 64)
-    for _ in range(1):
-        x = Normal_block(x, 32, 64)
+
+    for _ in range(3 - 1):
+        x = Normal_block(x, 64, 64)
     x = DownSampling_block(x, 64, 128 - 3)
     input_2 = MaxPooling2D(pool_size=(2, 2))(input_1)
     x_2 = Concatenate(axis=3)([x, input_2])
 
-    x = Normal_block(x_2, 128, 128)
-    for _ in range(3):
+    x_2 = Conv2D(64, (1, 1))(x_2)
+    x_2 = BatchNormalization(momentum=0.1)(x_2)
+    x_2 = Activation("relu")(x_2)
+    x = Normal_block(x_2, 64, 128)
+
+    for _ in range(5 - 1):
         x = Normal_block(x, 128, 128)
     x = Normal_block(x, 128, 64)
 
-    x_2 = Normal_block(x_2, 128, 64)
     x = Concatenate(axis=3)([x, x_2])
     x = UpSampling_block(x, 128, 64)
 
     x = Normal_block(x, 64, 32)
-    x_1 = Normal_block(x_1, 32, 32)
     x = Concatenate(axis=3)([x, x_1])
 
     x = UpSampling_block(x, 64, 16)
