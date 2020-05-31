@@ -1,5 +1,8 @@
+import os
+import glob
 import numpy as np
 import tensorflow as tf
+from tensorflow.keras.callbacks import ModelCheckpoint
 from tensorflow.python.client import device_lib
 device_list = device_lib.list_local_devices()
 
@@ -20,6 +23,7 @@ if gpus:
         print(e)
 
 try:
+    TRAIN_CHECKPOINT = "./checkpoints"
     TRAIN_RECORDS = "./data/VOC2012_resize_train.npz"
     TEST_RECORDS = "./data/VOC2012_resize_val.npz"
     # TRAIN_RECORDS = "./VOC2012_resize_train.npz"
@@ -71,6 +75,10 @@ try:
     # Load model
     print("Load Model...\n\n")
     model = Model.TestNet(input_shape=(CROP_HEIGHT, CROP_WIDTH, 3), classes=LABELS)
+    if not os.path.exists(TRAIN_CHECKPOINT):
+        os.makedirs(TRAIN_CHECKPOINT)
+    checkpoint = ModelCheckpoint(
+        filepath=os.path.join(TRAIN_CHECKPOINT, "checkpoint-{epoch:02d}.h5"), save_best_only=True)
     # model.summary()
     print("\nDone")
 
@@ -78,9 +86,15 @@ try:
         # Train model
         print("\n\nTrain Model...")
         model.compile(loss=Model.weighted_SparseCategoricalCrossentropy(SAMPLE_WEIGHT, classes=LABELS), optimizer='adam', metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
+        checkpointlist = glob.glob(os.path.join(TRAIN_CHECKPOINT, "checkpoint-*.h5"))
+        if len(checkpointlist) != 0:
+            checkpointlist.sort()
+            print(checkpointlist, checkpointlist[-1])
+            model.load_weights(checkpointlist[-1])
         model.fit(train_dataset, validation_data=test_dataset, epochs=EPOCHS,
                 steps_per_epoch=int(TRAIN_DATASET_SIZE / BATCH_SIZE),
-                validation_steps=int(TEST_DATASET_SIZE / BATCH_SIZE / 100))
+                validation_steps=int(TEST_DATASET_SIZE / BATCH_SIZE / 100),
+                callbacks=[checkpoint])
         print("  Done\n\n")
     except:
         import traceback
