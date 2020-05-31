@@ -4,6 +4,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.callbacks import ModelCheckpoint
 from tensorflow.python.client import device_lib
+import tensorflow_model_optimization as tfmot
 device_list = device_lib.list_local_devices()
 
 import Model_V0_1 as Model
@@ -78,7 +79,12 @@ try:
     if not os.path.exists(TRAIN_CHECKPOINT):
         os.makedirs(TRAIN_CHECKPOINT)
     checkpoint = ModelCheckpoint(
-        filepath=os.path.join(TRAIN_CHECKPOINT, "checkpoint-{epoch:02d}.h5"), save_best_only=True)
+        filepath=os.path.join(TRAIN_CHECKPOINT, "checkpoint.h5"), save_best_only=True)
+
+    pruning_schedule = tfmot.sparsity.keras.PolynomialDecay(
+                        initial_sparsity=0.0, final_sparsity=0.7,
+                        begin_step=0, end_step=int(TRAIN_DATASET_SIZE / BATCH_SIZE))
+    model = tfmot.sparsity.keras.prune_low_magnitude(model, pruning_schedule=pruning_schedule)
     # model.summary()
     print("\nDone")
 
@@ -86,15 +92,16 @@ try:
         # Train model
         print("\n\nTrain Model...")
         model.compile(loss=Model.weighted_SparseCategoricalCrossentropy(SAMPLE_WEIGHT, classes=LABELS), optimizer='adam', metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
-        checkpointlist = glob.glob(os.path.join(TRAIN_CHECKPOINT, "checkpoint-*.h5"))
+
+        checkpointlist = glob.glob(os.path.join(TRAIN_CHECKPOINT, "checkpoint.h5"))
         if len(checkpointlist) != 0:
             checkpointlist.sort()
-            print(checkpointlist, checkpointlist[-1])
-            model.load_weights(checkpointlist[-1])
+            print(checkpointlist)
+            model.load_weights(checkpointlist[0])
         model.fit(train_dataset, validation_data=test_dataset, epochs=EPOCHS,
                 steps_per_epoch=int(TRAIN_DATASET_SIZE / BATCH_SIZE),
                 validation_steps=int(TEST_DATASET_SIZE / BATCH_SIZE / 100),
-                callbacks=[checkpoint])
+                callbacks=[checkpoint, tfmot.sparsity.keras.UpdatePruningStep()])
         print("  Done\n\n")
     except:
         import traceback
