@@ -4,7 +4,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.callbacks import ModelCheckpoint
 from tensorflow.python.client import device_lib
-import tensorflow_model_optimization as tfmot
+# import tensorflow_model_optimization as tfmot
 device_list = device_lib.list_local_devices()
 
 import Model_V0_1 as Model
@@ -81,11 +81,10 @@ try:
     checkpoint = ModelCheckpoint(
         filepath=os.path.join(TRAIN_CHECKPOINT, "checkpoint.h5"), save_best_only=True)
 
-    pruning_schedule = tfmot.sparsity.keras.PolynomialDecay(
-                        initial_sparsity=0.0, final_sparsity=0.7,
-                        begin_step=0, end_step=int(TRAIN_DATASET_SIZE / BATCH_SIZE))
-    model = tfmot.sparsity.keras.prune_low_magnitude(model, pruning_schedule=pruning_schedule)
-    # model.summary()
+    # pruning_schedule = tfmot.sparsity.keras.PolynomialDecay(
+    #                     initial_sparsity=0.0, final_sparsity=0.7,
+    #                     begin_step=200, end_step=int(TRAIN_DATASET_SIZE / BATCH_SIZE))
+    # model = tfmot.sparsity.keras.prune_low_magnitude(model, pruning_schedule=pruning_schedule)
     print("\nDone")
 
     try:
@@ -101,7 +100,11 @@ try:
         model.fit(train_dataset, validation_data=test_dataset, epochs=EPOCHS,
                 steps_per_epoch=int(TRAIN_DATASET_SIZE / BATCH_SIZE),
                 validation_steps=int(TEST_DATASET_SIZE / BATCH_SIZE / 100),
-                callbacks=[checkpoint, tfmot.sparsity.keras.UpdatePruningStep()])
+                callbacks=[checkpoint])
+        # model.fit(train_dataset, validation_data=test_dataset, epochs=EPOCHS,
+        #         steps_per_epoch=int(TRAIN_DATASET_SIZE / BATCH_SIZE),
+        #         validation_steps=int(TEST_DATASET_SIZE / BATCH_SIZE / 100),
+        #         callbacks=[checkpoint, tfmot.sparsity.keras.UpdatePruningStep()])
         print("  Done\n\n")
     except:
         import traceback

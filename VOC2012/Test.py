@@ -78,7 +78,7 @@ try:
 
     # Load model
     print("\n\nLoad Model...\n")
-    model = tf.keras.models.load_model(MODEL_FILE,  custom_objects={'loss_function': weighted_SparseCategoricalCrossentropy(LABELS)})
+    model = tf.keras.models.load_model(MODEL_FILE, custom_objects={'loss_function': weighted_SparseCategoricalCrossentropy(LABELS)})
     model.summary()
     print("\nDone")
 
