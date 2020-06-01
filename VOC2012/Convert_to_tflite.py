@@ -7,8 +7,8 @@ try:
     # MODEL_TFLITE = "TestNet_VOC2012_npz.tflite"
     # MODEL_FILE = "model_viewer.h5"
     # MODEL_TFLITE = "model_viewer.tflite"
-    MODEL_FILE = "Model_V0_1.h5"
-    MODEL_TFLITE = "Model_V0_1.tflite"
+    MODEL_FILE = "Model_V0_1_p.h5"
+    MODEL_TFLITE = "Model_V0_1_p.tflite"
     LABELS = 5
     COLOR_DEPTH = 3
     CROP_HEIGHT = 32  # sensor.LCD[128, 160]
