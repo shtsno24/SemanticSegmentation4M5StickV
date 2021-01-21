@@ -11,3 +11,7 @@ A project to run semantic segmentation on M5StickV (Kendryte K210).
 精度がまだ出ていないので，出るようになったら作成する．
 
 The accuracy is far from practical, so we will make it when the accuracy is achieved.
+
+## 参考
+
+https://www.shtsno24.tokyo/2020/03/nncase-v020.html
